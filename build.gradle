@@ -1,0 +1,87 @@
+
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+group = 'br.com.lasthorizon'
+version = '0.0.1'
+base {
+    archivesName = 'sea-sovereign'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                lasthorizon {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {}
+
+        server {
+            args '--nogui'
+        }
+    }
+}
+
+// Mixin: usado para alargar a janela de conquistas (ver src/main/java/.../mixin e client/WideAdvancements.java)
+mixin {
+    add sourceSets.main, 'lasthorizon.refmap.json'
+    config 'lasthorizon.mixins.json'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://repo.spongepowered.org/repository/maven-public/'
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+jar {
+    manifest {
+        attributes('MixinConfigs': 'lasthorizon.mixins.json')
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+        mod_id: 'lasthorizon',
+        mod_name: 'Sea Sovereign',
+        mod_version: project.version,
+        mod_authors: 'Bellionzs',
+        mod_description: 'Crie seu personagem, escolha o próprio destino e encontre as Akuma no Mi.'
+    ]
+
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

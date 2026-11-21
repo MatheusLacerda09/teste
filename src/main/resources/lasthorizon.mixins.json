@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "br.com.lasthorizon.akuma.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "lasthorizon.refmap.json",
+  "client": [
+    "AdvancementsScreenMixin",
+    "AdvancementTabMixin",
+    "AdvancementWidgetMixin",
+    "FontIconAnimMixin",
+    "AbstractClientPlayerMixin",
+    "PlayerRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

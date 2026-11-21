@@ -1,0 +1,80 @@
+{
+  "parent": "lasthorizon:root",
+  "display": {
+    "icon": {
+      "item": "lasthorizon:gomu_fruit"
+    },
+    "title": {
+      "translate": "advancements.lasthorizon.eat_devil_fruit.title",
+      "color": "light_purple",
+      "bold": true
+    },
+    "description": [
+      {
+        "text": ""
+      },
+      {
+        "translate": "advancements.lasthorizon.eat_devil_fruit.description.quote",
+        "color": "light_purple",
+        "italic": true
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "",
+        "font": "lasthorizon:icons",
+        "color": "white"
+      },
+      {
+        "text": " "
+      },
+      {
+        "translate": "advancements.lasthorizon.eat_devil_fruit.description.power_label",
+        "color": "green",
+        "bold": true
+      },
+      {
+        "translate": "advancements.lasthorizon.eat_devil_fruit.description.power",
+        "color": "gray"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "",
+        "font": "lasthorizon:icons",
+        "color": "white"
+      },
+      {
+        "text": " "
+      },
+      {
+        "translate": "advancements.lasthorizon.eat_devil_fruit.description.price_label",
+        "color": "red",
+        "bold": true
+      },
+      {
+        "translate": "advancements.lasthorizon.eat_devil_fruit.description.price",
+        "color": "gray"
+      }
+    ],
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "comeu_akuma_no_mi": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "tag": "lasthorizon:devil_fruits"
+        }
+      }
+    }
+  }
+}

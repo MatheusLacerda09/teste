@@ -1,0 +1,73 @@
+{
+  "display": {
+    "icon": {
+      "item": "lasthorizon:gomu_fruit"
+    },
+    "title": {
+      "text": "Sea Sovereign",
+      "color": "aqua",
+      "bold": true
+    },
+    "description": [
+      {
+        "text": ""
+      },
+      {
+        "text": "",
+        "font": "lasthorizon:icons",
+        "color": "white"
+      },
+      {
+        "text": " "
+      },
+      {
+        "translate": "advancements.lasthorizon.root.description.quote",
+        "color": "aqua",
+        "italic": true
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "translate": "advancements.lasthorizon.root.description.body",
+        "color": "gray"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "",
+        "font": "lasthorizon:icons",
+        "color": "white"
+      },
+      {
+        "text": " "
+      },
+      {
+        "translate": "advancements.lasthorizon.root.description.hint_label",
+        "color": "white",
+        "bold": true
+      },
+      {
+        "translate": "advancements.lasthorizon.root.description.hint",
+        "color": "white"
+      }
+    ],
+    "background": "lasthorizon:textures/gui/advancements/backgrounds/akuma.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "entrou_no_mundo": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

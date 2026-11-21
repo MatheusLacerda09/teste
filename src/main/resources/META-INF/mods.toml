@@ -1,0 +1,56 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="lasthorizon"
+version="0.0.1"
+displayName="Sea Sovereign"
+authors="Bellionzs"
+logoFile="logo.png"
+logoBlur=false
+credits="Inspirado em One Piece, de Eiichiro Oda."
+description='''§6§lO mar está chamando...
+
+§7Aqui o destino é seu. Crie o seu personagem,
+§7zarpe rumo à §bGrand Line §7e escolha quem
+§7você vai ser: pirata, marinheiro ou algo que
+§7só o mar conhece. Nenhum caminho é imposto.
+
+§7Pelo caminho, as lendárias §dAkuma no Mi§7:
+§7frutas amaldiçoadas que dão poderes
+§7extraordinários... mas cobram um preço para
+§7o resto da vida.
+
+§e§lNesta versão
+§6• §fCriação de personagem §7com aparência, alma e sonho
+§6• §fGomu Gomu no Mi §7- o poder da borracha
+§6• §fMordida com efeitos e partículas únicas
+§6• §fTooltips animadas §7e conquistas da jornada
+
+§c§lO preço do poder
+§7O mar nunca mais vai te aceitar. Quem
+§7come uma Akuma no Mi não consegue mais
+§7nadar e sente a Vertigem do Diabo no
+§7fundo do oceano.
+
+§e§o"Eu vou ser o Rei dos Piratas!"
+
+§7Feito por §bBellionzs
+§r 
+§r 
+'''
+
+[[dependencies.lasthorizon]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.lasthorizon]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.20.2)"
+ordering="NONE"
+side="BOTH"

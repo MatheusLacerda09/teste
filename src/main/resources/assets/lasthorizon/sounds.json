@@ -1,0 +1,142 @@
+{
+  "ambient.sea_waves": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "lasthorizon:ambient/sea_waves",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.sea_wind": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "lasthorizon:ambient/sea_wind",
+        "stream": true
+      }
+    ]
+  },
+  "bird.songbird": {
+    "category": "ambient",
+    "subtitle": "subtitles.lasthorizon.bird.songbird",
+    "sounds": [
+      {
+        "name": "lasthorizon:bird/song_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "lasthorizon:bird/song_2",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "lasthorizon:bird/song_3",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "lasthorizon:bird/song_4",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "lasthorizon:bird/song_5",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "lasthorizon:bird/song_6",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "lasthorizon:bird/song_7",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ui.map_tick": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/tick"
+      }
+    ]
+  },
+  "ui.map_pick": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/pick"
+      }
+    ]
+  },
+  "ui.map_page": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/page"
+      }
+    ]
+  },
+  "ui.map_roll": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/roll"
+      }
+    ]
+  },
+  "ui.map_chime": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/chime"
+      }
+    ]
+  },
+  "ui.map_seal": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/seal"
+      }
+    ]
+  },
+  "ui.map_deny": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/deny"
+      }
+    ]
+  },
+  "ui.map_gem": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/gem"
+      }
+    ]
+  },
+  "ui.map_open": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/open"
+      }
+    ]
+  },
+  "ui.map_flap": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/flap"
+      }
+    ]
+  },
+  "ui.map_hover": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "lasthorizon:ui/hover"
+      }
+    ]
+  }
+}

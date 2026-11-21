@@ -1,0 +1,1134 @@
+Criação de personagem: só a altura, de 1,5 a 2,5 blocos, com o corpo todo crescendo junto
+- A barra de Largura saiu e a largura passou a acompanhar a altura: o personagem inteiro (cabeça, tronco, braços e pernas) é aumentado ou diminuído na mesma proporção, com a mesma escala nos três eixos. Não fica mais esticado. Antes as duas barras davam uma escala diferente em cada eixo: com 1,4x de altura ele ficava comprido e fino, com a cabeça alta e estreita; com 0,8x ficava achatado, com a cabeça larga e baixa; e braços e pernas chegavam a ficar uns 22% mais compridos no meio do passo ao andar (uma escala desigual deforma a peça quando ela gira).
+- A altura agora é em blocos: de 1,5 (mínimo) a 2,5 (máximo); o padrão é 1,8, a altura do jogador do jogo (escala 1, nenhum ajuste). A barra mostra o valor em blocos (1.80), gruda no padrão quando chega perto e tem uma marca a cada 0,10 bloco; a régua pontilhada do retrato marca onde chegaria o personagem padrão (1.80). A barra de Busto continua só no corpo feminino, logo abaixo da de Altura.
+- BodyScale (Java puro, usado pelo mixin do modelo, pela hitbox e pelo retrato): escala = altura / 1,8, presa em 1,5 a 2,5 blocos (0,83x a 1,39x). O mixin (PlayerRendererMixin) voltou a ser só um pose.scale igual nos três eixos, sem mexer nas peças do modelo.
+- Hitbox (CharacterEvents.onSize): largura e altura com a mesma escala; a altura em pé é exatamente a escolhida e os olhos acompanham. Atenção: com 2,5 blocos o personagem não passa por porta de 2 blocos de altura, nem agachado (agachado ele tem 2,08).
+- Dados: CharacterData.height passou a ser em centésimos de bloco (150 a 250, padrão 180) e a largura saiu (o número v[33] fica reservado, sempre 0, e o que estiver nele num registro antigo é ignorado). Personagens e rascunhos salvos com a altura em % do padrão (80 a 140, 100 = padrão) são convertidos ao carregar: 100% = 1,8 bloco, 140% = 2,5 (o máximo), 80% = 1,5 (o mínimo). As faixas não se encostam (80 a 149 era %, 150 a 250 é bloco), então a conversão é segura e repetir não muda nada. Valores fora das duas faixas continuam recusados pelo servidor. Protocolo de rede 18 para 19.
+- Textos (pt_br e en_us): a dica da Altura explica a faixa em blocos e que a largura acompanha; a Largura foi removida e o Busto passou a ser a chave size.1 (size.2 saiu).
+- Testes (tools/tests): faixa e padrão da altura, escala 1 exata no padrão, a hitbox em pé dá exatamente a altura em blocos de 1,5 a 2,5, valores fora da faixa presos, conversão dos registros antigos (100% = 180; 80% = 150; 140% = 250; 149% = 250), 150 não é convertido de novo, valores inválidos continuam recusados, contraprova do alongamento da perna com a conta antiga, e conferência de que o mixin, a hitbox, o retrato e os textos usam o BodyScale e não têm mais largura. Os 7 testes antigos que já falhavam (limites de itens do rosto) continuam iguais. A tela (CharacterMap) foi compilada com os stubs de tools/preview_java e renderizada com a barra nova (o harness aceita HEIGHT, BUST e GENDER); o resto só em prévia 3D desenhada à parte e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo.
+
+Criação de personagem: brincos com metal separado em cada orelha (prata ou dourado)
+- Pedido: poder escolher "dourado" e "prata" de forma diferente nos dois lados. Antes o metal dos brincos valia para as duas orelhas juntas.
+- Agora (página Rosto > Orelhas): cada orelha tem o seu metal. Os botões Esquerda / Direita vêm primeiro e cada um mostra uma amostra do metal da sua orelha; logo abaixo ficam os botões Prata / Dourado, que mudam só a orelha escolhida (a esquerda pode ficar dourada e a direita prateada, ou o contrário). Passar o mouse num botão de metal mostra "Metal da orelha esquerda" ou "Metal da orelha direita" e a explicação. As miniaturas dos itens passam a mostrar a lateral da cabeça da orelha que está sendo editada, no metal dela (antes era sempre a lateral direita). O metal dos piercings do rosto continua separado. No sorteio as duas orelhas saem com o mesmo metal na maioria das vezes (metais diferentes em 1 de cada 8 sorteios).
+- Por dentro: CharacterData ganhou earMetalR (último número, índice 36; INT_COUNT de 36 para 37) e o antigo earMetal virou earMetalL (continua no índice 26). SkinPainter pinta cada lateral da cabeça com o tom claro e o escuro do metal da própria orelha (SkinPainter.metalLt e metalDk, que a tela também usa nas amostras). Protocolo de rede de 17 para 18: cliente e servidor precisam ser desta versão.
+- Personagens antigos não mudam: registro sem o metal da direita (26, 27 ou 36 números) deixa a orelha direita no mesmo metal que já valia para as duas (o da esquerda; nos de 26 números, o dos piercings do rosto), então a skin sai idêntica à de antes.
+- Textos (pt_br e en_us): novos ear_metal.0 e ear_metal.1 (título e descrição); ear_edit.0 e ear_edit.1 agora citam o metal; saíram ear_metal.title e ear_metal.desc.
+- Testes (tools/tests): padrão prata nas duas orelhas; metal fora da faixa (e negativo) recusado em cada orelha; esquerda dourada com direita prateada (e o contrário) pinta cada lateral da cabeça no metal dela e nada mais na skin muda; prata nas duas é a skin de antes; sem brinco o metal não muda a skin; brinco só na esquerda com a direita em outro metal; ida e volta pelos números; registros de 26, 27 e 36 números ficam com as duas orelhas no metal antigo e a skin igual. Os 7 testes antigos que já falhavam (limites de itens do rosto) continuam iguais. A tela (CharacterMap) foi compilada com os stubs de tools/preview_java e renderizada (o FaceShot ganhou EARMETALR, EARL, EARR e EAREDIT); fora isso só visto em prévia e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo.
+- Já era assim antes e não mudou: na página Orelhas, por causa das 3 fileiras de itens, o texto de ajuda que aparece embaixo ao passar o mouse passa da borda do pergaminho (só o título cabe).
+
+Criação de personagem: busto de 25% e 10% menos inclinado e menos pontudo
+- Problema: a correção anterior (ângulo de 27° em 25%, 23,6° em 10% e 21° em 5%, afundando uns 1 px) deixou o peito pequeno afundado demais e inclinado demais: só a pontinha de baixo aparecia (47% / 34% / 26% da frente da caixa), como uma prateleira pontuda e estranha.
+- Agora (BustShape): só o expoente do ângulo abaixo de 50% mudou, TILT_LOW de 0,15 para 0,45. Ângulo / quanto a ponta sai do corpo / afundamento: 25% = 22,0° / 0,85 px / 0,65 px (antes 27,1° / 0,85 / 0,97); 10% = 14,6° / 0,54 px / 0,47 px (antes 23,6° / 0,54 / 1,06); 5% = 10,7° / 0,38 px / 0,36 px (antes 21,3° / 0,38 / 1,07). O quanto o peito sai do corpo continua igual ao da correção anterior; o que muda é que ele deita mais e afunda quase metade: a frente da caixa aparece 57% / 54% / 51% (antes 47% / 34% / 26%), uma rampa suave em vez de só a ponta. A faixa escura de baixo fica com 0,34 / 0,14 / 0,07 px (antes 0,44 / 0,24 / 0,15). O ângulo continua um pouco acima da curva original (a raiz do busto: 18,5° / 11,7° / 8°) e abaixo da versão s^0,3 (24° / 18,5° / 15°).
+- Não mudou: de 100% a 50% o ângulo e o afundamento são idênticos; 100% é o modelo do Blockbench; as caixas têm a mesma largura, altura e fundo e os dois peitos continuam colados; abaixo de 5% sem peito; texturas e UVs. A trava das costas fica folgada (mínimo de 0,47 px de folga). Para deitar ainda mais o peito pequeno é só subir BustShape.TILT_LOW (0,65 dá 19° / 10,5° / 6,7°).
+- Testes (tools/tests): ângulos de 75% / 50% / 25% / 10% / 5% (34° / 30° / 22° / 14,6° / 10,7°); o ângulo fica sempre entre a curva antiga (raiz) e a versão s^0,3; afundamento máximo de 0,70 / 0,55 / 0,45 px; parte visível da frente de pelo menos 50% / 45% / 42%; faixa escura de pelo menos 0,30 / 0,12 / 0,06 px em 25% / 10% / 5%. Os 7 testes antigos que já falhavam (limites de itens do rosto) continuam iguais. Só visto em prévia (de frente, de lado, em 3/4 e em 3/4 de cima, com skins reais, pele clara e escura, roupas com e sem camada externa, e a luz de entidades do Minecraft) e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo.
+
+Criação de personagem: busto de 25% e 10% arrumado (peito pequeno com volume e faixa escura visível)
+- Problema: com a saliência proporcional ao busto, o peito de 25% saía só 0,6 px do corpo, o de 10% só 0,24 px e o de 5% só 0,12 px. De frente, a faixa escura de baixo (a face de baixo da caixa: saliência x tangente do ângulo) ficava com 0,27 px em 25%, 0,08 px em 10% e 0,03 px em 5%, e só 36% / 19% / 12% da frente da caixa aparecia. O resultado era uma faixa branca chapada com um fio escuro embaixo (e o fio de 10% e 5% ainda piscava ao girar o personagem), sem parecer um peito pequeno.
+- Agora (BustShape): de 100% a 50% NADA muda (mesmo ângulo, mesmo afundamento: 37° / 34° / 30°, a ponta de baixo sai busto x 2,41 px). Abaixo de 50% (BustShape.KNEE), a partir do valor de 50%, sem salto: a ponta de baixo sai a RAIZ do busto (REACH_LOW = 0,5) em vez de em linha reta, e o ângulo cai bem mais devagar (TILT_LOW = 0,15; antes seguia o mesmo s^0,3). Ângulo / quanto a ponta sai: 25% = 27,1° / 0,85 px (antes 24,4° / 0,60), 10% = 23,6° / 0,54 px (antes 18,5° / 0,24), 5% = 21,3° / 0,38 px (antes 15,1° / 0,12).
+- Efeito de frente: a faixa escura de baixo passa a 0,44 / 0,24 / 0,15 px (25% / 10% / 5%) e aparece 47% / 34% / 26% da frente da caixa. Pela área do perfil, o peito de 25% passa de 8% para 15% do de 100%, o de 10% de 1,6% para 6,5% e o de 5% de 0,5% para 3,6% (50% fica em 28%, 75% em 58%). 25%, 10% e 5% continuam bem diferentes entre si.
+- Não mudou: as caixas continuam com a mesma largura, altura e fundo do modelo, os dois peitos colados no meio, 100% exatamente o modelo, abaixo de 5% sem peito, as texturas e os UVs. A trava das costas não precisa agir em nenhum tamanho de 5% a 99% (folga mínima 0,03 px, em 5%). O BreastLayer só ganhou o comentário novo; a conta toda está em BustShape (angleFactor, outFactor, retract).
+- Testes (tools/tests): de 50% a 99% o ângulo e o afundamento são os mesmos da versão anterior; de 5% a 49% a ponta sai a raiz do busto a partir de 50% (nunca menos que antes); as curvas se encontram em 50% sem salto; valores de 75% / 50% / 25% / 10% / 5% (ângulo e saliência); faixa escura mínima de 0,40 / 0,20 / 0,12 px e parte visível mínima de 45% / 30% / 24% em 25% / 10% / 5%; os três tamanhos continuam diferentes entre si; sai menos do corpo e fica menos inclinado a cada 1% a menos; o peito não atravessa as costas (nem com caixa mais funda). Os 7 testes antigos que já falhavam (limites de itens do rosto) continuam iguais. Só visto em prévia (de frente, de lado, em 3/4 e em 3/4 de cima, com skins reais, pele clara e escura, roupas com e sem camada externa, e a luz de entidades do Minecraft) e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo.
+
+Criação de personagem: peito menor mais inclinado
+- Com o busto menor que 100% o peito ia ficando deitado demais (quase uma tábua colada no corpo). Agora o ângulo cai mais devagar com o busto: BustShape.TILT = 0,30, ou seja, ângulo = 37° x busto elevado a 0,30 (antes era a raiz, 0,5). Ângulos: 75% = 34° (antes 32°), 50% = 30° (26°), 25% = 24° (18,5°), 10% = 18,5° (12°), 5% = 15° (8°). O 100% continua exatamente o mesmo (37°, sem afundar).
+- A saliência continua proporcional ao busto (a ponta de baixo sai busto x o que sai no modelo): como o ângulo é maior, o peito afunda um pouco mais no corpo (até cerca de 1 px em 25%), então fica mais inclinado e a parte visível da frente mais curta. A trava das costas continua valendo: com expoente menor que uns 0,3 a caixa afundada já bateria nas costas do corpo.
+- Testes novos: o peito menor é mais inclinado que na curva antiga em todos os tamanhos de 5% a 99%, e os ângulos de 50%, 25% e 10% são 30°, 24° e 18,5°; os de saliência proporcional e de não atravessar as costas continuam passando. Só visto em prévia (de lado e em 3/4, com skins reais) e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo.
+
+Criação de personagem: peito sem pixels esticados ou duplicados
+- Corrigido: a face de baixo de cada peito lia 3 colunas x 2 linhas da skin e esticava em 4 x 3 pixels do modelo, então as colunas e linhas saíam de largura desigual (um pixel parecia duplicado e os outros não), bem visível na faixa escura embaixo de cada peito. Agora nenhuma face do peito estica um desenho da skin: cada região lida tem o tamanho exato da face (1 pixel da skin = 1 pixel do modelo) ou é só uma linha / coluna de pixels repetida ao longo da face (como já eram as laterais e o topo). A frente continua lendo 4 x 4 em 4 x 4.
+- A face de baixo agora lê a linha v 24 inteira (4 colunas): a primeira abaixo do peito, justo a que ele esconde do corpo, então a parte de baixo continua o corpo sem repetir linhas (no casaco, a linha v 40). Em 100% é o mesmo peito de antes (mesma forma, ângulo e posição); só a textura da parte de baixo ficou limpa.
+- Mesma troca no modelo do Blockbench (art/models/peitos_sea_sovereign.bbmodel, as 4 faces de baixo), que continua igual ao BreastLayer.
+- Teste novo no CharacterLogicTest: lê o BreastLayer.java (tools/tests/run.sh passa a raiz do projeto em -Dlh.root) e falha se alguma face do peito voltar a esticar a textura; também confere que a regra recusa a face de baixo antiga. Só visto em prévia (feita com skins reais geradas pelo SkinPainter: todas as roupas, vários tons) e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo; a única mudança em Java são os números dos UVs.
+
+Criação de personagem: busto menor entra para dentro do corpo (sem encolher e sem separar os peitos)
+- Corrigido o busto (só no corpo feminino) quando fica menor que 100%. Antes cada peito encolhia em torno do próprio centro, então a borda de dentro se afastava do meio e abria um vão entre os dois. Agora o peito NÃO encolhe: as duas caixas continuam com a mesma largura, altura e profundidade do modelo, coladas no meio (sem vão), e o busto menor é só o peito entrando para dentro do peitoral e ficando menos inclinado (a angulação).
+- Como: o ângulo da inclinação cai com a raiz do busto (37° a 100%, 32° a 75%, 26° a 50%, 18,5° a 25%) e a caixa afunda no corpo o suficiente para a ponta de baixo sair da superfície exatamente busto x o que sai no modelo (50% sai metade, 25% sai um quarto). O topo da caixa some dentro do peitoral, então o peito menor começa mais embaixo em vez de subir até a clavícula. O afundamento nunca passa das costas (a caixa não atravessa o tronco). A 100% é exatamente o modelo de antes (37°, sem afundar); abaixo de 5% continua sem peito (peitoral liso).
+- A conta está numa classe de Java puro, BustShape (character/BustShape.java: retract e protrusion), usada pelo BreastLayer (Box.retracted, na camada base, na camada externa e no peito sobre armadura) e coberta por testes novos em tools/tests: 100% = modelo; de 5% a 99% a ponta sai exatamente busto x modelo, o ângulo fica entre 0 e 37° e cai a cada 1% a menos, o afundamento nunca é negativo e a caixa nunca passa das costas (nem a mais funda); caso do busto em 50%. Só visto em prévia e nos testes de lógica: não foi compilado com o Gradle nem testado dentro do jogo.
+- Também: comentários de CharacterOptions (idade, raças, porte) na ordem certa.
+
+Criação de personagem: escolha de raça
+- Nova sub-aba "Raça" na Identidade (Nome / Epíteto / Raça): 6 vagas, só Humana está disponível; as outras aparecem trancadas ("Em breve") com dica. Salva em CharacterData.race (índice 35, registros antigos = Humana); protocolo de rede 17. Dois ícones novos no atlas map_icons32.png (agora 8x6): espaço 40 = raça Humana (um soco: punho fechado de frente, redondinho, com os 4 nós dos dedos brilhando, polegar atravessado e manga azul de debrum dourado, MapIcons.H_RACE) e 41 = aba Raça (um globo terrestre iluminado de cima à esquerda, com a África e a Europa, o Saara em areia, nuvens, reflexo, meridiano dourado do lado direito e pedestal, MapIcons.H_RACES). Desenhados à mão na grade de 16 px (2x2 por pixel, contorno (2, 4, 20) e 1 pixel de margem, como os outros) e agora fazem parte do gerador oficial: tools/art/make_map_icons.py (OVERRIDES[40] e [41], paletas PAL_FIST e PAL_GLOBE; ROWS = 6, slots 42 a 47 reservados).
+
+Criação de personagem: cicatrizes redesenhadas, altura, largura e tamanho do busto
+- Cicatrizes (rosto e corpo) refeitas num sistema só (SkinPainter.stroke / ScarPal): em vez de riscos brancos chapados, cada cicatriz usa a cor da pele do personagem (tecido rosado nas peles claras, mais claro e quente nas escuras), relevo com sombra de um lado e luz leve do outro, ponta que afina, e dois tons de tecido alternando. Quatro tipos: curada, levantada (garras), ferida fresca (vermelha, pele inchada em volta e fio de sangue) e sutura (fios cruzando a costura).
+- Rosto: Cicatriz no olho (talho que passa por cima e por baixo do olho), na bochecha, na sobrancelha, Lábio partido (cruza o lábio), no queixo, Garras (levantadas), na testa, Pontos, Corte recente e as duas Queimaduras (degradê liso, brilho de pele esticada, borda pontilhada; sem o ruído de rede de antes).
+- Corpo: as 8 cicatrizes (peito, abdômen, braços, pernas, ombro, pele cicatrizada, hematomas com borda amarelo-esverdeada, costas) também usam o sistema novo, nos dois gêneros e em todos os tons.
+- Altura e largura: duas barras (iguais à da idade: plaquinha com o valor dentro) na página Pele (Corpo > Pele), de 0,80x a 1,40x do personagem padrão (1,00x gruda no meio). Valem no jogo: o modelo é esticado (PlayerRendererMixin, só o corpo, a placa de nome não distorce) e a hitbox e a altura dos olhos acompanham (EntityEvent.Size em CharacterEvents, nos dois lados; refreshDimensions ao sincronizar, entrar e renascer). No retrato, o quadro encolhe para caber um personagem mais alto e uma régua tracejada "1x" mostra a altura do padrão.
+- Busto: terceira barra (só no corpo feminino), de 0% a 100%; 100% é o tamanho atual (o máximo). BreastLayer encolhe as caixas em direção ao peitoral (continuam coladas), na camada externa e sobre armadura também; abaixo de 5% o peito fica liso.
+- Dados: CharacterData.height / width / bust (posições 32, 33, 34; INT_COUNT = 35; CharacterOptions.SIZE_MIN/SIZE_MAX/BUST_MIN/BUST_MAX). Registros e rascunhos antigos ficam em 100/100/100 (nada muda para quem já criou). O servidor recusa valores fora da faixa. Protocolo de rede 15 -> 16. Limpar a aba Corpo zera as barras. Textos novos em lang (size.0 a size.2 e .note) em pt_br e en_us; a nota da cor da pele virou dica ao passar o mouse para sobrar espaço.
+- Testes: porte válido/recusado e registro antigo (tools/tests). Os 7 testes que já falhavam antes (limites antigos de itens e INT_COUNT 27) continuam desatualizados e não foram mexidos.
+
+Criação de personagem: 8 cicatrizes novas no corpo (da classe Cicatrizes)
+- Novas, inspiradas nas skins de referência (Nox, Gard, Dina, Menyalo, Goodman, MM): Cortes no peito (talhos vermelhos na diagonal), Cortes no abdômen (riscos desencontrados), Cortes nos braços (listras vermelhas nos dois braços), Ralados nas pernas (crostas no joelho e risco na canela), Ferida no ombro (crosta escura com borda arroxeada), Pele cicatrizada (manchas rosadas e repuxadas pelo corpo), Hematomas (manchas lilás no peito, costas e braços) e Cortes nas costas (dois talhos em X e um risco).
+- Ao contrário das outras cicatrizes (rosto), estas são pintadas no corpo: tronco, braços e pernas (SkinPainter.bodyScars, bits 54 a 61, CharacterOptions.BODY_SCAR_BASE / BODY_SCAR_COUNT). Só pintam a camada de baixo e só em pele nua: roupa e camada externa ficam como estão, e a cabeça não muda. Valem nos dois gêneros (braço fino incluso) e em todos os tons; nas peles escuras o vermelho vira um tom mais claro e rosado para continuar aparecendo. Nada é sorteado: a mesma skin sai sempre igual.
+- Tela: a classe Cicatrizes passou de 10 para 18 itens (3 fileiras; o limite por classe subiu de 12 para 18). As miniaturas dos itens do corpo mostram a parte do corpo onde a cicatriz está (peito, abdômen, os dois braços, as duas pernas, ombro, tronco ou costas), com a roupa de baixo padrão, para a cicatriz não ficar escondida por uma roupa escolhida. Contam no limite de 5 itens como os demais.
+- Dados: FACE_ITEMS 54 -> 62 (o bit 61 é o último que cabe na parte alta da máscara). Registros antigos continuam válidos. Protocolo de rede 14 -> 15 (cliente e servidor na mesma versão). Textos novos em lang (extra.28 a extra.35) em pt_br e en_us.
+- Testes: as 8 cicatrizes aparecem em todos os tons e gêneros, não tocam na cabeça nem na camada externa e não pintam por cima da camisa. tools/preview_java/MapPreview ganhou o passo set=campo:valor (ex.: set=tab:1 set=bodyGroup:2 set=itemClass:2) para abrir uma página direto.
+
+Criação de personagem: miniaturas das orelhas com o piercing em destaque e olho Esbugalhados (Bug-eyed)
+- Miniaturas das orelhas: agora iguais às das outras classes: grade de 6 por fileira (2 fileiras) e a miniatura é a lateral da cabeça inteira (16x16), com pele, cabelo e camada externa do personagem, no mesmo enquadramento nos 7 itens.  Sem contorno nem destaque: é a skin como ela é, com o piercing pintado nela. Sempre mostra a orelha com o piercing, mesmo com o lado "Esquerda" ou "Direita" escolhido (o lado só vale na skin). Novo CharacterMap.variantEarMask().
+- Olho Esbugalhados (estilo 51): a cor da íris mexia na sombra da pálpebra (linha de cima e cantos, letra l) e a pupila era sempre escura. Agora a sombra é neutra (letra c, igual aos outros estilos) e a pupila 2x2 usa a íris (I em cima, i embaixo), então trocar a cor do olho muda a pupila. Piscar e olhar de lado seguem funcionando.
+
+Criação de personagem: metal das orelhas, textos sem corte e descrições na hora
+- Metal próprio nas orelhas: a classe Orelhas agora tem os botões Prata / Dourado dela, separados dos da classe Piercings (cada uma escolhe o seu; dá para ter piercings dourados no rosto e brincos de prata). Novo campo CharacterData.earMetal (posição 26; INT_COUNT = 27; protocolo de rede 13 -> 14). Registros e rascunhos antigos (26 números): as orelhas ficam no mesmo metal que já tinham (o dos piercings). Aleatório sorteia os dois. A miniatura das orelhas ficou 3x e mostra só a área da orelha, então o metal aparece bem.
+- Lista dos itens marcados (página Rosto): nomes sempre inteiros, sem "…". Com os 5 marcados a lista quebra em duas colunas ou em linhas corridas e encolhe a letra (80% -> 72% -> 64%) até caber acima da borda do pergaminho; só usa os nomes curtos se nem assim couber. Antes o último nome (ex.: Brilho labial) passava da borda e os compridos eram cortados ("Piercing na sobra…").
+- Descrição na hora: passando o mouse num item, no botão de metal ou no de orelha, o nome e a descrição inteira aparecem embaixo da grade (antes só no balão, depois de 5 s). A letra encolhe um pouco se a descrição for comprida, nada é cortado.
+- Página Rosto mais compacta (cabeçalho, abas das classes e botões de metal / orelha mais baixos) para sobrar espaço às listas de baixo.
+- Textos que eram cortados e agora aparecem inteiros: título + nome da cor ("Cor do cabelo - Castanho-escuro"), texto da aba Alma ("Você tem cinco rolagens."), avisos do nome e do epíteto, descrição abaixo dos estilos, epíteto e lema no resumo final (lema em até 3 linhas). Novo helper CharacterMap.paragraph(): quebra o texto e encolhe a letra (mínimo 62%) em vez de cortar.
+- Testes: metal das orelhas (separado do rosto, padrão, faixa, registro de 26 números) e INT_COUNT 27.
+
+Criação de personagem: orelhas (Transversal, lado), cadeado e nomes
+- Piercings de orelha: novo item Transversal (barra atravessando a cartilagem; bit 53, EAR_COUNT = 7) e escolha da orelha (As duas / Esquerda / Direita) que vale para todos eles (CharacterData.earSide, posição 25; INT_COUNT = 26). Os 7 itens das orelhas ficam numa fileira só, com a miniatura recortada no meio da lateral da cabeça.
+- Cadeado das casas sem vaga redesenhado e centralizado; o número no selo das abas agora usa algarismos de 3 x 5 pixels (o 5 aparece certo).
+- Nomes dos curativos e do esparadrapo mais curtos na lista dos marcados (chaves .short no lang); a lista ajusta a largura das colunas e encolhe a letra antes de cortar com reticências.
+- Protocolo de rede 12 -> 13. Testes novos: orelha só esquerda, só direita, lado fora da faixa e Transversal.
+
+Criação de personagem: rosto com 5 itens, cor dos lábios e brincos de orelha
+- Limite de itens do rosto: de 3 para 5 (CharacterOptions.ADORN_MAX). Personagens antigos continuam válidos.
+- Batom e Brilho labial agora têm escolha de cor (10 cores, CharacterOptions.LIP; a primeira, "Clássico", é o visual de sempre). A fileira de cores aparece na classe Outros quando um dos dois está marcado. Sem batom, o brilho colorido tinge o lábio. O Batom escuro continua com a cor própria de vinho. Dados: novo campo lip (posição 24; INT_COUNT = 25).
+- Nova classe Orelhas (6 itens, bits 47 a 52): Argola, Pino no lóbulo, Hélix, Tragus, Orelha completa e Brinco pendente. São pintados nas duas laterais da cabeça e seguem o metal Prata/Dourado, que agora aparece também nessa classe. A miniatura mostra a lateral da cabeça.
+- Botões e textos da página Rosto: abas das classes menores, com selo dourado com a quantidade marcada em cada uma; casas com selo de visto e, sem vaga, cadeado; botões de metal com brilho; nomes dos itens marcados em duas colunas e letra menor (cabem os 5); textos e dicas mais curtos em pt_br e en_us.
+- Protocolo de rede 11 -> 12. Testes atualizados (limite 5, 25 números) e novos (cor dos lábios, orelhas nas duas laterais, metal nos brincos).
+
+Criação de personagem: mais marcas, cicatrizes e outros itens no rosto
+- 21 itens novos na aba Corpo > Rosto, que agora tem 5 classes (em duas fileiras de abas): Faces, Piercings, Cicatrizes, Marcas e Outros. Os itens antigos foram só reorganizados nas classes (a máscara guardada não mudou), e o limite continua em 3 itens por personagem.
+- Cicatrizes (8 no total, 6 novas + a do olho e a da bochecha que já existiam): na sobrancelha, no lábio, no queixo, garras (dois cortes paralelos), na testa, queimadura, pontos (sutura com os fios) e corte recente (sangue seco).
+- Marcas e tatuagens: marca de nascença, tatuagem tribal, pontos tatuados, listras azuis, estrela, barba por fazer, olho roxo e fuligem (junto com a lágrima pintada e a pinta, que já existiam). Nas peles escuras a tinta das tatuagens vira um azul-acinzentado claro, para continuar aparecendo.
+- Outros: curativo na testa, sombra nos olhos (na cor da íris), batom escuro, rosto gelado (nariz e bochechas vermelhos) e brilho labial.
+- Todos seguem o tom de pele escolhido, se medem pelo estilo de olhos (SkinPainter.eyeZone) e nunca pintam em pixel que vira olho ao piscar ou olhar: não dançam quando o olho anima. Funcionam nos dois gêneros e com todos os 52 estilos de olhos.
+- Dados: a máscara de itens do rosto passou de int para long (CharacterData.adorn). v[21] guarda os bits 0 a 30 como antes e o novo v[23] guarda os bits 31 em diante (INT_COUNT = 24). Personagens e rascunhos antigos continuam válidos. Protocolo de rede 11 (cliente e servidor na mesma versão).
+- Textos novos em lang (extra.N, item_class.2 a 4) em pt_br e en_us. Testes novos em tools/tests (itens novos x todos os olhos, peles e gêneros; registros antigos; limites da máscara). tools/preview_java/run_map.sh agora põe os recursos no classpath.
+
+Criação de personagem: olhos que piscam e olham
+- Os olhos de todos os estilos piscam no jogo (aberto, meio fechado, fechado, meio fechado; cada jogador no seu ritmo): o desenho inteiro do olho (cílios, pontas, asas, contorno, branco, íris) fecha junto.
+- CharacterClient: uma textura por jogador, com as versões (piscar x olhar) pintadas só quando aparecem pela primeira vez. Corrigido o CharacterClient dos zips de piscar anteriores, que tinha perdido onSync, handReveal, sayWelcome etc.
+
+Criação de personagem: estilos de olhos
+- Nova sub-aba "Olhos" no Corpo (a cor da íris agora é a sub-aba "Íris"): 15 estilos de olhos com nome e descrição (Padrão, Pontinhos, Gotas, Cílios, Intensos, Felinos, Asas, Marcantes, Amendoados, Grandes, Dramáticos, Sonolentos, Brilhantes, Arregalados, Contorno), inspirados nas tabelas de olhos de referência. Cada um pinta SÓ os olhos (SkinPainter.EYE_STYLE_GRID), com a cor da íris escolhida e branco/pálpebra no tom da pele; o resto do rosto fica como estava. Miniaturas mostram a faixa dos olhos no visual atual do personagem. Barba e sobrancelhas do estilo de rosto "Determinado" não cobrem os olhos. O Aleatório também sorteia o estilo de olhos; "limpar aba" do Corpo volta ao Padrão.
+- Dados: novo campo eyeStyle (posição 20 do vetor; INT_COUNT = 21). Personagens e rascunhos antigos continuam válidos (ficam no estilo 0, o olho de sempre). Protocolo de rede 8 (cliente e servidor na mesma versão).
+- Ferramentas: tools/tests/run.sh e tools/preview_java/run_map.sh voltam a compilar (faltavam BaseSkin/PxNoise e worldReady no preview).
+
+Corpo feminino
+- Skin base feminina (textura/skin/base_female.png) trocada pela nova, de braço fino (3 px), enviada pelo autor, sem nenhuma edição. Todos os tons de pele da criação de personagem saem dela: BaseSkin multiplica o tom da paleta pela razão de cada pixel (mesma paleta de antes, então nada mais mudou).
+
+Tontura
+- Vertigem do Diabo ao comer a fruta agora dura 5 s (era 10 s): GomuCurse.EAT_DIZZY_TICKS = 100.
+
+Tontura
+- Animacao do icone da Vertigem do Diabo (mob_effect/dizzy.png) invertida: os 6 frames agora rodam na ordem contraria.
+
+Comandos (em ingles)
+- Novos comandos em command/ModCommands.java: /sheet, /sheet <player> (op), /character reset <player> (op), /devilfruit grant|revoke|status <player> (op). Substituem /ficha e /personagem resetar. Mensagens nos arquivos de idioma (commands.lasthorizon.*).
+
+Corpo feminino
+- Criação de personagem: o gênero feminino agora usa a skin desenhada à mão (textura/skin/base_female.png), recolorida pela pele e pela roupa de baixo escolhidas, igual ao masculino. A skin foi convertida de braço grosso (4 px) para braço FINO (3 px, modelo "slim"), que continua sendo o do feminino.
+- Peitos: camada 3D (client/BreastLayer.java), só para o feminino e só os peitos. O formato vem do modelo do Blockbench (art/models/peitos_sea_sovereign.bbmodel): caixas inclinadas 37°, medidas em BreastLayer.BASE/OUTER no mesmo sistema do Blockbench. Texturas lidas da própria skin (frente do top; laterais e embaixo repetem a borda). Cópia maior para a camada externa (casaco/colete). Somem com peitoral vestido ou jogador invisível.
+
+Criação de personagem (refinamento, seguindo o Claude.md)
+- Corpo no nível das skins de autor (músculos desenhados à mão, sombras rosadas, manchas suaves, tecido com luz e vincos, cabelo em mechas com tufos, rosto detalhado) em todos os tons de pele e nos dois gêneros; nova roupa padrão "Traje de partida" (OUTFITS = 6, OUTFIT_DEFAULT = 5). As outras roupas seguem iguais e agora mostram a pele sombreada.
+- Abas com estado (cinza/dourado/vermelho/verde), barra de progresso, setas na faixa de título, atalhos, limpar aba (botão direito).
+- Aba Alma refeita: traços em plaquinhas, trilho de força, painel de descrição e contador.
+- Retrato: zoom (roda e botões), ver de costas, plaqueta "Seu futuro começa aqui."
+- Cores novas no fim das paletas, com nome; descrições de estilos; Corpo em sub-abas; nome aleatório; Aleatório completo.
+- Origem com benefício/limitação/requisitos; Sonho expansível; Passado com dica do mar natal e exemplos de lema.
+- Resumo da Jornada com retrato e linhas clicáveis; rascunho automático em arquivo.
+- Pergaminho translúcido atrás do texto da página da direita.
+- Personalização ampliada: 8 estilos de cabelo, 8 de rosto, barba (bigode, cavanhaque, cheia) e acessórios (bandana, chapéu de pirata, tapa-olho, óculos, brinco); Cabelo e Roupa em sub-abas.
+- Epíteto opcional (sub-aba da Identidade, sugestões clicáveis, dado); aparece no retrato, no resumo e na ficha.
+- Alma sorteada: botão "Girar a alma" com animação (traços assentam um a um), sem escolha manual; 6 ícones novos (farol, balança, raposa, gaivota, caneca, nuvem) e ícones de epíteto, barba e acessório.
+- 8 sons novos sintetizados (assets/lasthorizon/sounds/ui) e animações: virada de página, abas deslizando, anel de escolha, brilho de aba concluída, cartão do resumo, faíscas do selo; faixa de título colorida por aba e marca-d'água do ícone.
+- Retrato com cena animada de entardecer no mar (céu em faixas com pontilhado, sol, nuvens à deriva, mar cintilante, convés de madeira); grão de papel e cantoneiras de latão nas páginas.
+- Seletores de cabelo, rosto, barba, acessório e roupa agora são grades de miniaturas reais (cabeça ou tronco pintados pelo SkinPainter, no visual atual do personagem); Cabelo e Roupa ganharam a sub-aba Cor.
+- Dica das abas mais curta; selo do botão Finalizar com aro de ouro.
+- Ícones com iluminação de volume (formas arredondadas, luz quente em cima à esquerda, sombra fria, contorno colorido): renderizador v2 em tools/art/make_map_icons.py ("--v1" gera o antigo).
+- Ícones v3: arte original da folha mantida e só completada (contorno, buracos, partes que faltavam); rosto antigo restaurado; leme (baseado no leme das conquistas), raposa sentada e barba (busto) refeitos; dado original completado; gaivota e caneca com contorno completo (tools/art/make_map_icons.py).
+- Ícones feitos pelo usuário (identidade, dado, estilo de cabelo, ambos os gêneros, barba, raposa, caneca) em tools/art/user_icons/: entram como estão no map_icons32.png e reduzidos 2x para o map_icons.png.
+- Só o atlas 32x32 (map_icons32.png) é mantido; o 16x16 foi removido e MapIcons.draw() reduz o 32x32 na hora.
+- Criação de personagem: jogo parado até terminar (solo: tela pausa o jogo; servidor: mobs e hora do dia congelam até 1 jogador finalizar, ver CreationFreeze) e sem UI nenhuma (HUD, mão, toasts, tutorial de W/A/S/D e mouse) até o personagem ser confirmado.
+- Finalização: o fade de saída ficou mais longo e suave (3 s); o escurecimento some primeiro e o pergaminho/selo por último, sem ficar tela preta. O braço do personagem (com a skin criada) reaparece subindo de baixo durante o fade (CharacterClient.handReveal + CharacterClientEvents.onHand).
+- Boas-vindas no chat refeitas (moldura dourada, nome, epíteto, alma, lema e um desejo): montadas no cliente de quem criou, só aparecem para essa pessoa e só depois que a tela fecha. A animação do braço é só em primeira pessoa.
+- Conquista "Sea Sovereign": só é dada depois de terminar o personagem, quando a tela fechou e o braço e a UI já reapareceram (cliente avisa com o pacote Revealed); o aviso no chat continua para todos. A tela de criação some por inteiro primeiro (fade de 2,4 s) e só então o braço e o HUD (hotbar, vida, fome, XP...) sobem de baixo aparecendo aos poucos (1,7 s); a conquista sai quando terminam. Protocolo de rede 7.
+- Protocolo de rede 5 (cliente e servidor precisam estar na mesma versão); rascunhos e personagens antigos continuam válidos.
+- Corpo masculino agora vem da skin desenhada à mão (textures/skin/base_male.png), só recolorida por BaseSkin: a pele multiplica o tom da paleta pela razão de cada pixel (músculos e sombras intactos) e a cueca (cinza da skin) recebe a cor da roupa mantendo dobras e sombras. Cabelo, olhos, rosto, barba, acessórios e as outras roupas continuam sendo pintados por cima. O corpo feminino (braço fino) segue pintado por código até existir uma skin base slim; se o PNG faltar, o masculino também cai no pintor antigo.
+- Cabelo padrão da criação de personagem agora é o careca (CharacterOptions.HAIR_STYLE_DEFAULT = 4); "limpar aba" do cabelo volta para ele.
+- Rosto (SkinPainter.face) agora só adiciona os olhos (branco quente e íris) e a boca por cima da skin base, sem sobrancelha, nariz, bochecha nem sombras no queixo: o desenho da skin desenhada à mão fica intacto. Os estilos de rosto (determinado, cicatriz, sardas, marcas de expressão, pintura facial, cicatriz na bochecha, olhar cansado) só acrescentam a marca que o nome diz e seguem o tom de pele escolhido.
+- Nas grades da criação de personagem o careca é a primeira opção de cabelo e o traje de partida (roupa de baixo) é a primeira roupa (CharacterOptions.HAIR_STYLE_ORDER / OUTFIT_ORDER). Só a ordem de exibição mudou; os valores guardados e os personagens já criados continuam iguais.
+
+1.20.1 Changelog
+47.2
+====
+ - 47.2.0 1.20.1 RB
+
+47.1
+====
+ - 47.1.47 Keep order of sources in PackRepository (#9702)
+           Co-authored-by: dhyces <10985914+dhyces@users.noreply.github.com>
+ - 47.1.46 Fix DelegatingPackResources searching resource path twice (#9697)
+ - 47.1.45 Fix `Level` leak in debug HUD (#9699)
+           Co-authored-by: malte0811 <malte0811@web.de>
+ - 47.1.44 Fix PlayerSpawnPhantomsEvent not being fired (#9689)
+ - 47.1.43 Enhance LivingBreathEvent and LivingDrownEvent. Closes #9680
+           Also remove 3.5MB of useless data from the installer.
+ - 47.1.42 Partially revert LazyOptional changes, now no longer internally uses weak references.
+ - 47.1.41 Make LazyOptional's internal references to invalidation listeners use WeakReference, and allow modders to unregister themselves. Closes #8805
+ - 47.1.40 Revert EntityEvent.Size changes to before #9018 was called. (#9679)
+           Kept newly added methods for binary compatibility but deprecated them all for removal.
+           The entire pose/eye/size system needs to be reevaluated and address some of Mojang's changes.
+           However this should fix any bugs that pulling that PR may of caused.
+ - 47.1.39 Add a config option to restore the calculate all normals behavior in case some setups require old broken behavior. (#9670)
+ - 47.1.38 Fix rounding errors on models with 45 degree normals by favoring one Direction (#9669)
+           Should fix flickering issues when breaking custom models and having our vanilla solution disabled.
+ - 47.1.37 Moved ForgeHooksClient.onCreativeModeTabBuildContents to ForgeHooks to fix #9662
+ - 47.1.36 Fix tag removal functionality that broke during the 1.19 update. Closes #9053 and #8949
+ - 47.1.35 Replace string with forge tag in vanilla recipes. Closes #9062
+ - 47.1.34 Fix new brain hooks not persisting active activities.
+ - 47.1.33 Fix breaking overlay flickering on campfires by using vanilla method to calculate block normals. (#9664)
+ - 47.1.32 Cleanup usages of static imports and build script so that our build doesn't spam useless error like messages.
+           So that it is easier to see real errors.
+           Add compatibility checking to standard testing tasks.
+ - 47.1.31 Added Action value to PlayerInteractEvent.LeftClickEvent to expose what action fired the event. #9175
+ - 47.1.30 Fix parameter names in IForgeDimensionSpecialEffects.adjustLightmapColors to better describe what they are. (#9656)
+ - 47.1.29 Re-add EntityEvent.Size methods to maintain bincompat
+ - 47.1.28 Added LivingMakeBrainEvent, to allow a consistent way for modders to manipulate entity Brains. #9292
+ - 47.1.27 Add LivingSwapHandItemsEvent
+ - 47.1.26 Fixed FluidUtil#tryFillContainer returning invalid result when simulating #9358
+ - 47.1.25 Re-add in-game mod menu (#9652)
+ - 47.1.24 Fix Entity eye height for multipart entities.
+ - 47.1.23 Fix conflicting keybindings not having the correct click count set. #9360
+ - 47.1.22 Fix the Emissive Rendering for Experimental Light Pipeline (#9651)
+ - 47.1.21 Fixed AdvancementsScreen.java.patch buttons not rendering (#9649)
+ - 47.1.20 Properly Handle Fluid Updates while in a Boat #9428
+ - 47.1.19 New hook in IClientBlockExtensions to handle enabling tinting on breaking particles. #9446
+ - 47.1.18 Fix invalid index when ticking itemstacks in a player nventory by adding a new onInventoryTick event. Closes #9453
+ - 47.1.17 Make the FireworkShapes enum extensible (Closes #9486)
+ - 47.1.16 Add `EmptyEnergyStorage` (#9487)
+ - 47.1.15 Support IPv6 address compression for logged IPs
+ - 47.1.14 Make item name rendering and status bar rendering respect additional gui overlays being rendered by mods (#9648)
+ - 47.1.13 Fix EyeHeight event being fired twice (#9647)
+ - 47.1.12 Add PlayerSpawnPhantomsEvent, utilized to block or forcefully allow PhantomSpawner to spawn phantoms (#9644)
+ - 47.1.11 Fix creative mode screen not correctly using CreativeModeTab::getTabsImage (#9627)
+ - 47.1.10 Add option to advertise dedicated servers to LAN.
+ - 47.1.9  Fix entity eye height loop.
+ - 47.1.8  Particle Description Data Provider.
+ - 47.1.7  Add LivingBreatheEvent and LivingDrownEvent (#9525)
+ - 47.1.6  Fix entity size event not being fired, changed it to split eye height and size calculations. (#9535)
+ - 47.1.5  AlterGroundEvent for modifying block placement performed by AlterGroundDecorator (#9637)
+ - 47.1.4  Change ProjectileHitEvent to return a result instead of being cancelable. Closes #9642
+ - 47.1.3  Replace static import with regular one to fix S2S and non-official mappings. (#9633)
+ - 47.1.2  Add missing null check for TagsProvider#existingFileHelper (#9638)
+ - 47.1.1  Add GuiGraphics helpers for blitNineSliced and blitRepeating that support specifying a custom texture size (#9641)
+ - 47.1.0  1.20.1 Recommended Build
+
+47.0
+====
+ - 47.0.50 Fix FMLOnly loading. Closes #9609
+ - 47.0.49 Improve logging for server connections (#9618)
+ - 47.0.48 Fix placing fluids into waterlogged blocks with FluidUtil::tryPlaceFluid. To behave more like vanilla MC-127110 (#9586)
+ - 47.0.47 Expose loaded RegistryAccess through AddReloadListenerEvent (#9613)
+ - 47.0.46 Fix GLM applying to entities when killed. Closes #9551
+ - 47.0.45 Add unordered creative tabs after vanilla and perform a second level sorting of tabs by registry name to ensure tabs are ordered the same between game restarts (#9612)
+ - 47.0.44 Fix Early Loading window FPS snafu where it could spam (#9619)
+           unlimited screen updates. Probably a good way to gently toast an ancient laptop.
+ - 47.0.43 Make overloads consistent for defineListAllowEmpty in ForgeConfigSpec.Builder (#9604)
+ - 47.0.42 Moved GameShuttingDownEvent hook to DedicatedServer class. Fixes #9601
+ - 47.0.41 Fix PitcherCropBlock not calling canSustainPlant, not allowing it to be placed on custom farmland. Close #9611
+ - 47.0.40 Add null check to NetworkHooks.openScreen. Closes #9597
+ - 47.0.39 Fix ShieldBlockEvent not correctly performing damaged functions when not all damage is blocked. (#9615)
+ - 47.0.38 Add IP address to client disconnect message. Closes #9603
+ - 47.0.37 Fix hotbar items not dimming when sleeping in bed. Closes #9616
+ - 47.0.36 Bump Eventbus to address NullPointerException when classloading things on some threads. Closes #9570
+ - 47.0.35 Try and be a bit nicer about handling bad [feature] definitions  (#9606)
+           * Try and be a bit nicer about handling bad [feature] definitions - they're single square bracket defined and require strings for feature bound values.
+           * Some more tweaks to the feature system to output useful and well formatted error messages when bounds fail. Requires SPI 7.0.1 and the language string "fml.modloading.feature.missing" has changed.
+           * Use immutable lists where possible and generally tidy things a bit
+ - 47.0.34 [HotFix]: Somehow not caught by CI, but there was an issue in the SpawnUtils to handle.
+ - 47.0.33 Remove amount from FluidStack hashCode to fix the equal/hashCode java contract (#9602)
+ - 47.0.32 Add example usage for configs to the MDK (#9596)
+           Demonstrates proper usage of different config value types, validation, transformation/parsing, load/reload handling and direct field access.
+ - 47.0.31 Demonstrate configureEach in run configs (#9594)
+ - 47.0.30 Reduce verbosity of prepareRuns doc in MDK (#9593)
+ - 47.0.29 Lazily configure MDK tasks, improve IDE support (#9592)
+ - 47.0.28 Fix not dropping xp for player sourced explosions and various other cases when xp should drop (#9588)
+ - 47.0.27 add item handler capability to chiseled bookshelf (#9587)
+ - 47.0.26 Fix ignoring maxUpStep method overrides on entities (#9583)
+ - 47.0.25 Add missing damage type tag provider modid, existing file helper constructor overload (#9581)
+ - 47.0.24 Expose holder lookup registry provider as a helper in RegistriesDatapackGenerator (#9580)
+ - 47.0.23 Fix gametest collection causing secondary crash in loading error state (#9568)
+ - 47.0.22 Fix SpriteCoordinateExpander not working with chained methods (MC-263524) (#9564)
+ - 47.0.21 Expose EntityRendererProvider.Context to AddLayers event (#9562)
+ - 47.0.20 [1.20] Add events for checking spawn conditions (SpawnPlacementCheck and PositionCheck) (#9469)
+ - 47.0.19 Another tweak to the early display. We start a timer process while we create the window, in case it hangs. Also add a skip version config, to try and help in cases where the driver is stupid. (#9595)
+ - 47.0.18 Auto generate names for modded loot pools. Fixes #9589 (#9591)
+ - 47.0.17 More tweaks to the mod loading callbacks to make loading bars work better (#9585)
+ - 47.0.16 Reimplement LootPool name patches and hooks (#9573)
+ - 47.0.15 Fix experimental lighting pipeline breaking vanilla's emissive rendering. Closes #9552 (#9582)
+ - 47.0.14 Update early loading default configs to match standard expectations. (#9577)
+           Also allow a global override env variable for darkmode always. "FML_EARLY_WINDOW_DARK"
+ - 47.0.13 Add proper duplicate mod error message that includes the mod id(s) and mod files. (#9474)
+ - 47.0.12 Add missing stack tooltip rendering hooks (#9533)
+           Fix automatic tooltip wrapping discarding empty lines used as spacers
+ - 47.0.11 Add piston push reaction overrides to Block class (#9538)
+ - 47.0.10 Fix missing calls to level-sensitive block SoundType getter (#9553)
+ - 47.0.9  Fix forge registries that have wrappers/support tags not being in the HolderLookup Provider that is provided to the GatherDataEvent (#9566)
+ - 47.0.8  Make IItemDecorator a functional interface again. Fixes #9563 (#9574)
+ - 47.0.7  Make 1.20.x the main TC branch.
+ - 47.0.6  Fix custom geometry in parent models not being resolved (#9572)
+ - 47.0.5  Make the scheduled thread factory setDaemon on it's threads. Should allow things to close properly if something deadly happens early on. (#9575)
+ - 47.0.4  This is an early display window system for forge. (#9558)
+ - 47.0.3  fix the JIJ break by bumping SJH. apologies.
+ - 47.0.2  update libs (#9565)
+ - 47.0.1  Update Armor Layer Implementation to Match Vanilla (#9547)
+ - 47.0.0  1.20.1 Update
+
+46.0
+====
+ - 46.0.14 Fix JAR compatibility checks for 1.20 (#9556)
+ - 46.0.13 [1.20] Add `AFTER_LEVEL` render level stage (#9555)
+ - 46.0.12 Reorder overlay layers to match vanilla (#9550)
+ - 46.0.11 Re-implement missing level-sensitive block light hook in ChunkAccess (#9536)
+ - 46.0.10 Fix issues in the deserialization of empty ingredients (#9537)
+ - 46.0.9  Fix wrong variable passed into EnchantmentClue lookup Fixes #9543 (#9544)
+ - 46.0.8  Fix incorrect depth test state in debug graph rendering Fixes #9534 (#9539)
+ - 46.0.7  Fix initCapabilities patch location in ServerLevel Fixes #9526 (#9531)
+ - 46.0.6  Use Spinning Effect Intensity instead of Partial Tick for Portal Overlay Fixes #9529 (#9530)
+ - 46.0.5  Fix getArmorModelHook patch, Fixex #9523 (#9528)
+ - 46.0.4  Fix duplicate Map writes in PlayerList patch. (#9521)
+ - 46.0.3  Fix Forge Version including MC version in MDK.
+ - 46.0.2  Fix patch in light propagation (#9532)
+ - 46.0.1  Attempt to fix jar signing
+           Gradle 8 is stupid and doesn't (easily) allow in-place tasks, so a temporary fix has been made in ForgeGradle 6
+ - 46.0.0  Forge 1.20
+           - Creative mode tabs are now a registry; the `BuildContents` event was renamed to `BuildCreativeModeTabContentsEvent` and moved it to its own class
+           - The pack format is now 15 for both resource packs and data packs
+           - `ScreenUtils` was deprecated in favor of a `GuiGraphics` extension
+           - Forge and the MDK were updated to Gradle 8 and FG6
+           - The Forge common config file was removed (it only contained the deprecated old fields for resource caching, which was removed in 1.19.3)
+           - Registry dummy entries were removed
+           - `RemappingVertexPipeline` was fixed to forward the `endVertex()` call
+           - Forge tool tags were removed in favor of vanilla ones
+           Co-authored-by: ChampionAsh5357 <ash@ashwork.net>
+           Co-authored-by: coehlrich <coehlrich@users.noreply.github.com>
+           Co-authored-by: Dennis C <11262040+XFactHD@users.noreply.github.com>
+           Co-authored-by: Matyrobbrt <matyrobbrt@gmail.com>
+
+45.1
+====
+ - 45.1.0 1.19.4 Recommended Build
+
+45.0
+====
+ - 45.0.66 Add method to GatherDataEvent to obtain collection of all input paths. (#9499)
+ - 45.0.65 Log error when Sheets is class-loaded before registration is completed (#9475)
+ - 45.0.64 [1.19.x] Re-implement RenderTooltipEvent.Color (#9497)
+           * Reimplement RenderTooltipEvent.Color
+           * Formatting, comments, EXC
+           * Deprecate instead of replacing
+ - 45.0.63 Add API for registering custom world preset editors (#9436)
+ - 45.0.62 Remove unneeded extra reload of datapacks on world creation screen (#9454)
+ - 45.0.61 Bump ASM to 9.5
+ - 45.0.60 Fix crash when running server from root directory
+           Fixes #9498
+ - 45.0.59 Fix root transform matrix format, allow using all four root transform formats (#9496)
+ - 45.0.58 Add missing AT lines to allow registering custom game rule boolean/integer types (#9489)
+ - 45.0.57 [1.19.x] Fix SaplingGrowTreeEvent#setFeature being ignored in FungusBlock (#9485)
+           Co-authored-by: Brennan Ward <3682588+Shadows-of-Fire@users.noreply.github.com>
+ - 45.0.56 Restore AccessibilityOnboardingScreen
+           Fixes #9488
+ - 45.0.55 Update documentation on FinalizeSpawn (#9467)
+ - 45.0.54 Fix fluids without sound event causing exception in tryFillContainer and tryEmptyContainer (#9445)
+ - 45.0.53 Make FakePlayerFactory respect the given ServerLevel (#9479)
+ - 45.0.52 Collect and log exceptions occurring in DeferredWorkQueue tasks (#9449)
+ - 45.0.51 Fix `NamespacedWrapper#wrapAsHolder` (#9450)
+ - 45.0.50 Fixes ChatScreen calling .setScreen (#9443)
+           Fix test compile failures also.
+ - 45.0.49 Determine the Forge version the PR was built against when running PR compat checks (#9374)
+ - 45.0.48 Add buildscript test to error on deprecated members that should of been removed. (#9460)
+ - 45.0.47 Remove erroneous brace patch in Inventory (#9462)
+           Fixes #9459
+ - 45.0.46 [1.19.4] Move root transform builder to ModelBuilder to allow use in ItemModelBuilder (#9456)
+ - 45.0.45 Fix forge grindstone hooks allowing stacks of non-stackable items (#9457)
+ - 45.0.44 [1.19.4] Fix FMLOnly (#9415)
+ - 45.0.43 Fix ItemLayerModel erroneously adding particle texture to layer texture list (#9441)
+ - 45.0.42 Temporary fix for Canceling ProjectileImpactEvents of Piercing ammo.
+           Event needs to be re-worked to have finer control. #9370
+ - 45.0.41 Fix dummy air blocks not being marked as air (#9440)
+ - 45.0.40 Add support for splitting the login packet (#9367)
+           It contains full copies of data registries and can easily surpass vanilla's limits
+ - 45.0.39 Remove Attack Range and Reach Distance and add Block Reach and Entity Reach (#9361)
+ - 45.0.38 Add default bucket sounds for milk (#9432)
+ - 45.0.37 Deprecate Item.onUsingTick, as vanilla provides the same function in Item.onUseTick now. Closes #9342
+ - 45.0.36 Fix ScreenEvent.Init.[Pre/Post] not working correctly (#9431)
+ - 45.0.35 Allow FenceGateBlock to be used without a WoodType. Closes #9392
+ - 45.0.34 Deprecate duplicate tool tags that vanilla added in 1.19.4
+           We will maintain a seperate 'tools' tag until Mojang adds all relevent tool tags.
+           Closes #9393
+ - 45.0.33 Fix BlockEvent.Break not using ItemStack enchantment hooks.
+ - 45.0.32 Move Block.onCatchFire to above block removal to allow usage of BlockEntity data. Closes #9400
+ - 45.0.31 Fix FinalizeSpawn not blocking spawns during worldgen (#9420)
+ - 45.0.30 Fixed issue with MutableHashedLinkedMap when removing multiple sequential entries in the middle of the map.
+           Added Unit tests for MutableHashLinkedMap
+           Added support for removing using the iterator
+           Added concurrent modification detection to the iterator
+           Added default constructor with basic hashing strategy.
+           Closes #9426
+ - 45.0.29 Loosen access for BucketItem's canBlockContainFluid (#9421)
+ - 45.0.28 Update and Regenerate Datapacks (#9419)
+           Add generation for pack.mcmeta
+ - 45.0.27 Restore ability to change message in ClientChatEvent (#9377)
+ - 45.0.26 Remove duplicate line in FoodData patch (#9424)
+           The line was accidentally duplicated in the 1.19.4 update and patching
+           process.
+           Fixes #9422
+ - 45.0.25 Rename RegisterParticleProviderEvent's register methods to describe what kind of particle providers they register (deprecating old methods to avoid breaking) and minor docs tweaks (#9388)
+ - 45.0.24 Update pack versions (#9414)
+ - 45.0.23 [1.19.4] Revamp and fix spawn events (#9133)
+ - 45.0.22 [1.19.4] Replace blitOffset parameter with PoseStack in IItemDecorator (#9409)
+           * Replace blitOffset with PoseStack in IItemDecorator
+           * Circumvent breaking changes
+           * Fix blitOffset type
+ - 45.0.21 Fix JSON model root transforms (#9410)
+ - 45.0.20 Fix tossed items not being able to be picked up by other players. Closes #9412 (#9404)
+ - 45.0.19 Fix infinite BE render bounds failing frustum intersection test. Closes #9321 (#9407)
+ - 45.0.18 Make ForgeSlider use the new vanilla texture (#9406)
+ - 45.0.17 Add BlockSetType#register to accesstransformer.cfg (#9386)
+ - 45.0.16 Add option to completely hide a crash-callable depending on a runtime value (#9372)
+ - 45.0.15 Add isNewChunk to ChunkEvent.Load (#9369)
+ - 45.0.14 Remove DistExecutor calls in PistonEventTest (#9348)
+ - 45.0.13 Fix hardcoded precipitation in ClimateSettingsBuilder (#9402)
+           This effectively caused all biomes to have precipitation, such as
+           minecraft:desert.
+           Fixes #9397
+ - 45.0.12 Fix incorrect variable used for swimming check (#9403)
+           Because of the incorrect variable, the check to stop sprinting (and stop
+           swimming) never fired correctly.
+           1.19.3's `flag5` variable was renamed to `flag7` in 1.19.4; however,
+           this was not caught during patching because of the fuzzy patcher.
+           Fixes #9399
+ - 45.0.11 Fix incorrect boolean used for glint effect (#9401)
+           The `flag1` variable is ultimately controlled by whether the armor slot
+           being rendered is for the leggings, which explains this bug where the
+           leggings always had the enchantment glint but not any other armor piece.
+           Fixes #9394
+ - 45.0.10 Fixed ModMismatchDisconnectedScreen displaying missing mods wrongly (#9398)
+ - 45.0.9  Fix misaligned text render type patch (#9391)
+ - 45.0.8  Remove thread filter from processing clientside custom payloads. Closes @9390
+ - 45.0.7  Fix LivingEntity patch which caused crash while entities got hurt. Closes #9389
+ - 45.0.6  Fix wrong parameters in `Screen#renderTooltipInternal` patch (#9387)
+ - 45.0.5  Fix misaligned patch in LevelRenderer. Closes #9385
+ - 45.0.4  Remove our fix for MC-121048 as it has been fixed by Vanilla (#9381)
+ - 45.0.3  Fix advancements not loading, bug seems to be fixed by vanilla now. Closes #9384
+ - 45.0.2  Fixed patch verifier for cases where patches lowered access levels. Closes #9383
+ - 45.0.1  Fix crouching while sprinting stopping the player when step height is modified. Closes #9376
+ - 45.0.0  Forge 1.19.4
+           Properly move `ServerStatusPing` to codec
+           Reimplement custom display contexts
+           Co-authored-by: Matyrobbrt <matyrobbrt@gmail.com>
+           Co-authored-by: coehlrich <coehlrich@users.noreply.github.com>
+
+44.1
+====
+ - 44.1.23 Fix experimental world warning screen appearing everytime (#9375)
+ - 44.1.22 Fix continuing to use items after dropping or when a shield breaks (MC-231097, MC-168573) (#9344)
+ - 44.1.21 Add onStopUsing hook to IForgeItem (#9343)
+ - 44.1.20 Document RegisterParticleProvidersEvent's APIs (#9346)
+ - 44.1.19 Fix incorrect ListTag.getLongArray result (MC-260378) (#9351)
+ - 44.1.18 Fix missing patch that left TagBuilder#replace unused (#9354)
+ - 44.1.17 Add 2 new RenderLevelStageEvent.Stage for After Entities and After Block Entities (#9259)
+ - 44.1.16 Cleanup StemBlock Patch (#9337)
+ - 44.1.15 Cleanup ItemProperties patch (#9332)
+ - 44.1.14 Make IForgeIntrinsicHolderTagAppender methods properly chainable (#9331)
+ - 44.1.13 Fix in custom fluids not respecting max height correctly. (#9319)
+ - 44.1.12 Fix inconsistent vaporization in BucketItem & FluidType (#9269)
+ - 44.1.11 Fix reloading event firing during server shutdown and add explicit unloading event instead (#9016)
+ - 44.1.10 Homogenize and/or holdersets when serializing to prevent serializing to NBT from crashing (#9048) Fixes #9043
+ - 44.1.9  [1.19.x] Fix `ForgeSlider` not respecting custom height (#9237)
+ - 44.1.8  Fix stepsound for blocks in the inside_step_sound_blocks tag. (#9318)
+ - 44.1.7  Fix missing hanging sign material for modded wood type (#9303)
+ - 44.1.6  Fire TickEvent.LevelTickEvent on ClientLevel tick (#9299)
+ - 44.1.5  Add ClientChatReceivedEvent for system messages (#9284)
+ - 44.1.4  PR Action update (#9274)
+ - 44.1.3  fix HangingSignEditScreen crash when using custom wood types using modid (#9294)
+ - 44.1.2  Bump SecureJarHandler version, to help identify invalid mods.
+ - 44.1.1  [1.19.3] Hotfix missing null check in createUnbakedItemElements (#9285)
+ - 44.1.0  Mark 1.19.3 Recommended Build
+
+44.0
+====
+ - 44.0.49 [1.19.3] Allow Item and Elements models to specify static color, sky light, and block light values. (#9106)
+ - 44.0.48 Fix StemBlock not checking canSustainPlant for the correct block, it now checks for Melons/Pumpkins instead of the stem itself. (#9270)
+ - 44.0.47 Add github shared actions for automation purposes. (#9251)
+ - 44.0.46 Add translate key for Forge pack.mcmeta description (#9260)
+ - 44.0.45 Fix broken link for update checker docs in mdk (#9271)
+ - 44.0.44 Remove duplicate updateNeighbourForOutputSignal call Fixes #9169 (#9234)
+ - 44.0.43 Add helper methods to access the set of loaded sprite locations (#9223)
+ - 44.0.42 Disable guiLight3d for generated item models (#9230)
+ - 44.0.41 Remove resource caching (#9254)
+ - 44.0.40 Add TradeWithVillagerEvent (#9244)
+ - 44.0.39 Update link for Parchment "Getting Started" (#9243)
+ - 44.0.38 Allows DatapackBuiltinEntriesProvider to datagen LevelStems (#9247)
+ - 44.0.37 Add a method to LootContext.Builder that allows changing the queried loot table id (#9084)
+ - 44.0.36 [1.19.3] Fix Datagen Tests and Providers (#9212)
+ - 44.0.35 Fix concrete powder not being hydrated by singular water sources (#9236)
+ - 44.0.34 [1.19.3] Fix LootTableLoadEvent not getting fired (#9239)
+ - 44.0.33 Allow using custom factories in button builders (#9238)
+ - 44.0.32 Fix logspam when a root resource is requested from DelegatingPackResources, fixes #9197 (#9227)
+ - 44.0.31 [1.19.3] Fix `retrieveRegistryLookup` attempting to get the registry lookup from a `HolderGetter` (#9225)
+ - 44.0.30 [1.19.3] Add ability to datagen forge specific values in pack.mcmeta (#9221)
+           Co-authored-by: sciwhiz12 <sciwhiz12@gmail.com>
+ - 44.0.29 Add block atlas config to register forge:white texture (#9187)
+ - 44.0.28 Fix ExtendedButton not being highlighted when focused (#9144)
+ - 44.0.27 Separate checkAndFix from the check* tasks. (#9213)
+ - 44.0.26 Fix forge resources overriding vanilla ones (#9222)
+ - 44.0.25 Fix tooltip customization not working for creative inventory (#9218)
+ - 44.0.24 Fix glowing item frame entity's texture (#9126)
+           Fixes #9123
+ - 44.0.23 Fix datapack registries not being synced to clients (#9219)
+ - 44.0.22 Fix creatives tabs rendering overlapping tabs if the selected tab isn't on the current page. (#9214)
+ - 44.0.21 Fix `SidedInvWrapper` not accounting for vanilla stacking special cases in brewing stands and furnaces (#9189)
+ - 44.0.20 Update to the latest JarJar. (#9217)
+ - 44.0.19 Specify NetworkHooks#getEntitySpawningPacket Generic Return Type (#9220)
+ - 44.0.18 Fix using a DeferredRegister on a non-forge wrapped registry. Closes #9199
+ - 44.0.17 Add support for custom CreativeModeTab implementations (#9210)
+ - 44.0.16 Simplify tree grower patches (#9209)
+ - 44.0.15 Replace AdvancementProvider patch with Forge helper (#9188)
+ - 44.0.14 Allow using `PackOutput`s in Forge-added datagen classes (#9182)
+ - 44.0.13 Add simpleBlockWithItem for data gens (#9170)
+ - 44.0.12 Fix running test mods (#9211)
+ - 44.0.11 [1.19.3] Fix models nested in custom geometries not resolving parents (#9200)
+ - 44.0.10 Fix OBJ Loader caches not being thread-safe. (#9204)
+ - 44.0.9  [1.19.3] Add event before baked models are cached by the BlockModelShaper (#9190)
+ - 44.0.8  Fix compatibility checker task configuration (#9202)
+ - 44.0.7  Fix chat offset (#9184)
+ - 44.0.6  Redesign CreativeTab collection event to be a lot more straight forward. (#9198)
+ - 44.0.5  Move ICondition patch placement to before MC throws an error.
+           Disable the explicitly erroring test biome modifier.
+ - 44.0.4  Fix BlockStateProvider not waiting for models before finishing. (#9196) Fixes #9195:
+ - 44.0.3  Fix tooltips not rendering on screens. Closes #9191
+ - 44.0.2  Fix merged mod resource pack not returning all resources with the same name when asked. Closes #9194
+ - 44.0.1  Fix searching using the wrong prefix for items or tags. Fixes #9176 Fixes #9179 (#9177)
+ - 44.0.0  Forge 1.19.3
+           Created a CreativeModeTabEvent to register creative mode tabs and populate entries per tab
+           Moved datapack registries to DataPackRegistryEvent.NewRegistry event instead of tying them to ForgeRegistry
+           Made it easier for mods to datagen datapack builtin entries with DatapackBuiltinEntriesProvider
+           Provided access to lookupProvider for datagen
+           Updated dependencies to match versions used by vanilla and update JarJar to 0.3.18
+           Added a test mod for the new CreativeModeTabEvent
+           Throws better error message for Forge registries in tag datagen
+           Deleted ForgeRegistryTagsProvider
+           Updated ClientChatReceivedEvent and ServerChatEvent for Mojang changes
+           Added patches for both sign related methods in ModelLayers
+           Changed RegisterShadersEvent to use ResourceProvider
+           Migrated old Mojang math types to JOML
+           Co-authored-by: Marc Hermans <marc.hermans@ldtteam.com>
+           Co-authored-by: LexManos <LexManos@gmail.com>
+           Co-authored-by: sciwhiz12 <arnoldnunag12@gmail.com>
+           Co-authored-by: coehlrich <coehlrich@users.noreply.github.com>
+
+43.2
+====
+ - 43.2.0 43.2 Recommended Build.
+
+43.1
+====
+ - 43.1.65 Allow discovering services from the mods folder that use java's modular definition. (#9143)
+ - 43.1.64 Make Datapack Registries support ICondition(s) (#9113)
+ - 43.1.63 Enable additional build types to handle pull request validation. (#9159)
+ - 43.1.62 Check source permission level before selector permission (#9147)
+           In some situations, such as execution of a function by an advancement as
+           part of its reward, a command source stack may have a backing source of
+           a ServerPlayer which may lack the entity selector permission and have an
+           explicit permission level that should allow the use of entity selectors,
+           through CommandSourceStack#withPermission.
+           We now check if the permission level of the command source stack is
+           sufficient for entity selectors _before_ checking if the source is a
+           player and if they have the requisite permission.
+           This means that an operator permission level of 2 will always override
+           the Forge entity selector permission.
+           Fixes #9137
+ - 43.1.61 Fix fires spreading too/igniting custom portal frames. (#9142)
+ - 43.1.60 Add supplier to FlowerBlock so it works with custom MobEffects (#9139)
+ - 43.1.59 Fix some logical bugs related to the Grindstone Event (#9089)
+ - 43.1.58 Call baked model's `getModelData` before `getRenderTypes` (#9163)
+ - 43.1.57 Make Util.memoize thread-safe (#9155)
+ - 43.1.56 Rendering tweaks and fixes: Part 4 (#9065)
+ - 43.1.55 Fix `Transformation` loading `PoseStack` (#9083)
+ - 43.1.54 Add simple block appearance API (#9066)
+ - 43.1.53 Fix invalidated modded packets when on LAN (#9157)
+ - 43.1.52 Improve extensibility of DetectorRailBlock and PoweredRailBlock (#9130)
+ - 43.1.51 Fix launch handler minecraft classpath locator (#9120)
+ - 43.1.50 Add HitResult to `EntityTeleportEvent$EnderPearl` (#9135)
+ - 43.1.49 Throw aggregate exception for erroneous registry event dispatch (#9111)
+           This means that exceptions occurring during the dispatch of the registry
+           events, such as those from the suppliers of RegistryObjects, properly
+           cause a crash rather than merely being logged and allowing the game to
+           reach the main menu.
+           Fixes #8720
+ - 43.1.48 Add missing semi-colon near the Dist import statement in example mod.
+ - 43.1.47 Fix ClientModEvents example not subscribing to client-sided events (#9097)
+ - 43.1.46 Use GitHub action to lock issues with the `spam` label (#9087)
+ - 43.1.45 Remove structures slave map to Feature registry (#9091)
+ - 43.1.44 Improve logging of missing or unsupported dependencies (#9104)
+ - 43.1.43 [1.19.x] Fix ValueSpec caching the return value incorrectly (#9046)
+ - 43.1.42 [1.19.x] Add event for registering spawn placements, and modifying existing (#9024)
+ - 43.1.41 [1.19.x] Add event for items being stacked or swapped in a GUI. (#9050)
+ - 43.1.40 [1.19.x] Fix PlayerInteractEvent.EntityInteractSpecific not cancelling on a server (#9079)
+ - 43.1.39 Fix canceling phantom spawns preventing any further attempts that tick. (#9041)
+ - 43.1.38 Rename fluid type milk translation keys (#9077)
+ - 43.1.37 Fix minecart speed with water (#9076)
+ - 43.1.36 Add a cancellable event that gets fired when a Totem of Undying is used (#9069)
+ - 43.1.35 Fix performance issue and logging when resource caching is enabled (#9029)
+ - 43.1.34 Fix NPE when feeding wolves and cats (#9074)
+ - 43.1.33 Fix logically breaking change to ForgeConfigSpec.Builder#comment where modders could not add a empty line to the start of comments. (#9061)
+ - 43.1.32 Fix ServiceLoader bug
+ - 43.1.31 Fix ClientChatReceivedEvent for system messages
+ - 43.1.30 Make ForgeConfigSpec$Builder.comment able to be called multiple times for the same entry. (#9056)
+ - 43.1.29 Fix control modifier for mac with `KeyMapping`s  using Alt instead of Super (#9057)
+ - 43.1.28 Fix is_desert tag not being applied correctly. (#9051)
+ - 43.1.27 Fix mob griefing event for SmallFireballs not using owner entity. (#9038)
+ - 43.1.26 Fix minecarts on rails not properly slowing down in water (#9033)
+ - 43.1.25 Change codestyle for BookShelves tag. Closes #9027
+           Add IS_CAVE tag Closes #8885
+           Add IS_DESERT tag Closes #8979
+           Simplify Mangrove Swamp tags Closes #8980
+ - 43.1.24 Allow faces of an "elements" model to have disabled ambient occlusion (#9019)
+ - 43.1.23 [1.19.x] Recipe ID-based grouping between modded and vanilla recipes. (#8876)
+ - 43.1.22 Update fence_gates/wooden (#8936)
+ - 43.1.21 [1.19.x] Added event for growing fungus (#8981)
+ - 43.1.20 Added Bookshelves block tag (#8991)
+ - 43.1.19 Create a Forge EntityType Tag for Bosses (#9017)
+ - 43.1.18 Allow mods to specify shader import namespace (#9021)
+ - 43.1.17 Grindstone Events (#8934)
+           One to modify the output, and one to modify the input.
+ - 43.1.16 Fix the serialized names of the enum (#9014)
+ - 43.1.15 Fix `tryEmptyContainerAndStow` duping fluids with stackable containers (#9004)
+ - 43.1.14 Add mod mismatch event (#8989)
+ - 43.1.13 [1.19.x] add methods with more context to tree growers (#8956)
+ - 43.1.12 [1.19.X] Adding more precise events for Advancements (#8360)
+ - 43.1.11 Default IItemHandler capability for shulker box itemstacks (#8827)
+           Co-authored-by: LexManos <LexManos@gmail.com>
+ - 43.1.10 [1.19] Add hook for items to remain in the hotbar when picking blocks/entities (#8872)
+ - 43.1.9  [1.19.x] Block Model Builder Root Transform Support (#8860)
+           Co-authored-by: sciwhiz12 <sciwhiz12@gmail.com>
+ - 43.1.8  [1.19.x] Make LivingSetAttackTargetEvent compatible with the Brain/Behavior system. (Port of PR #8918) (#8954)
+ - 43.1.7  [1.19.x] Add IForgeBlock#onTreeGrow to replace IForgeBlock#onPlantGrow from 1.16 (#8999)
+ - 43.1.6  [1.19.x] Moved Player.resetAttackStrengthTicker() to the end of Player.attack() (#9000)
+ - 43.1.5  fix misplaced patch in sapling block (#9005)
+ - 43.1.4  Fix failed entity interactions consuming the click. (#9007)
+ - 43.1.3  Fix entity selector permission check to check original source (#8995)
+           Permission checks should be against the command source and not the
+           target entity, as is done in vanilla.
+           Fixes #8994
+ - 43.1.2  Hotfix for 1.19.2 item animation bug (#8987)
+           * [HOT FIX]: Fixes #8985 by no-oping for vanilla models instead of throwing error
+ - 43.1.1  Add ability to Auto register capabilities via annotation (#8972)
+ - 43.1.0  1.19.2 RB
+
+43.0
+====
+ - 43.0.22 Added ItemDecorator API (#8794)
+ - 43.0.21 [1.19.x] Custom usage animations for items (#8932)
+ - 43.0.20 Allow registering custom `ColorResolver`s (#8880)
+ - 43.0.19 [1.19] Allow custom outline rendering on EntityRenderers and BlockEntityRenderers (#8938)
+ - 43.0.18 Redirect checks for entity selector use to a permission (#8947)
+           This allows greater flexibility for configuring servers with
+           operator-like permissions to user groups through the permissions API and
+           their permissions handler of choice without needing to grant the
+           vanilla operator permission to any player.
+           The new permission is "forge:use_entity_selectors", which is granted by
+           default to players with permission level 2 (GAMEMASTERS) and above.
+           The hook falls back to checking the permission level if the source of
+           the command is not a ServerPlayer, such as for command blocks and
+           functions.
+ - 43.0.17 Allow FakePlayer to report its position (#8963)
+ - 43.0.16 Add alternate version of renderEntityInInventory to allow for directly specifying the angles (#8961)
+ - 43.0.15 Add cancellable ToastAddEvent (#8952)
+ - 43.0.14 Modify ScreenEvent.RenderInventoryMobEffects to allow moving the effect stack left or right (#8951)
+ - 43.0.13 Fix Enchantment#doPostHurt and Enchantment#doPostAttack being called twice for players. Fixes MC-248272 (#8948)
+ - 43.0.12 Remove reflective implementation of ICustomPacket. (#8973)
+           Make vanilla custom packets able to be sent multiple times. Closes #8969
+ - 43.0.11 Filter name spaces to directories only. Closes #8413
+ - 43.0.10 Fix a corner case where the UMLB can not extract a version from a library. (#8967)
+ - 43.0.9  Fix worlds with removed dimension types unable to load. (#8959) Closes #8800
+ - 43.0.8  Fix issue where unknown chunk generators would cause DFU to fail. (#8957)
+ - 43.0.7  Fix comments and documentation that were missed during the review of #8712 (#8945)
+ - 43.0.6  Make AnvilUpdateEvent fire even if the second input is empty, which means it fires even if only changing the item name. (#8905)
+ - 43.0.5  Fix `LivingEntity#isBlocking` to use `ToolActions#SHIELD_BLOCK` instead of `UseAnim#BLOCK` (#8933)
+ - 43.0.4  Add Custom HolderSet Types allowing for logical combining of sets. (#8928)
+ - 43.0.3  Add values to VersionSupportMatrix to support loading mods that restrict versions to 1.19.1 on 1.19.2 (#8946)
+ - 43.0.2  Fix certain particles not updating their bounding box when their position changes (#8925)
+ - 43.0.1  Update EventBus to address concurrency issue in ModLauncher Factory. Closes #8924
+ - 43.0.0  1.19.2
+
+42.0
+====
+ - 42.0.9 Remove calls to getStepHeight in Player#maybeBackOffFromEdge (#8927)
+ - 42.0.8 Add forge tags for tools and armors, these DO NOT replace ToolActions, and are designed just for Recipes. (#8914)
+ - 42.0.7 Add Biomes.BEACH to Tags (#8892)
+ - 42.0.6 Let NetworkInstance.isRemotePresent check minecraft:register for channel IDs.  (#8921)
+ - 42.0.5 Add an event for when the chunk ticket level is updated (#8909)
+ - 42.0.4 Re-add PotentialSpawns event (#8712)
+ - 42.0.3 Fix misplaced patch in ItemEntityRenderer breaking ItemEntityRenderer#shouldBob() (#8919)
+ - 42.0.2 [1.19] [HotFix] Fix the dedicated server not having access to the JiJ filesystems. (#8931)
+ - 42.0.1 Match Mojang's action bar fix for MC-72687 (#8917)
+ - 42.0.0 Forge 1.19.1
+          Load natives from classpath
+          Make command argument types a forge registry
+          Add `EntityMobGriefingEvent` to `Allay#wantsToPickUp`
+          Overhaul `ServerChatEvent` to use `ChatDecorator` system
+          Remove `ClientChatEvent#setMessage` for now
+          Gradle 7.5
+
+41.1
+====
+ - 41.1.0 Mark 1.19 RB
+
+41.0
+====
+ - 41.0.113 Allow faces of an "elements" model to be made emissive (#8890)
+ - 41.0.112 Fix invalid channel names sent from the server causing the network thread to error. (#8902)
+ - 41.0.111 Fix PlayerEvent.BreakSpeed using magic block position to signify invalid position. Closes #8906
+ - 41.0.110 Fix cases where URIs would not work properly with JarInJar (#8900)
+ - 41.0.109 Add new hook to allow modification of lightmap via Dimension special effects (#8863)
+ - 41.0.108 Fix Forge's packet handling on play messages. (#8875)
+ - 41.0.107 Add API for tab list header/footer (#8803)
+ - 41.0.106 Allow modded blocks overriding canStickTo prevent sticking to vanilla blocks/other modded blocks (#8837)
+ - 41.0.105 Multiple tweaks and fixes to the recent changes in the client refactor PR: Part 3 (#8864)
+            Fix weighted baked models not respecting children render types
+            Allow fluid container model to use base texture as particle
+            Fix inverted behavior in composite model building. Fixes #8871
+ - 41.0.104 Fix crossbows not firing ArrowLooseEvent (#8887)
+ - 41.0.103 Add User-Agent header to requests made by the update checker (#8881)
+            Format: Java-http-client/<Java version> MinecraftForge/<ForgeVer> <ModId>/<ModVersion>
+ - 41.0.102 Output the full path in a crash report so it is easier to find the outer mod when a crash in Jar-In-Jar occurs. (#8856)
+ - 41.0.101 Clean up the pick item ("middle mouse click") patches (#8870)
+ - 41.0.100 [1.19.x] Hotfix for test mods while the refactor is ongoing
+ - 41.0.99  add event to SugarCaneBlock (#8877)
+ - 41.0.98  Fix Global Loot Modifiers not using Dispatch Codec (#8859)
+ - 41.0.97  Allow block render types to be set in datagen (#8852)
+ - 41.0.96  Fix renderBreakingTexture not using the target's model data (#8849)
+ - 41.0.95  Multiple tweaks and fixes to the recent changes in the client refactor PR: Part 2 (#8854)
+            * Add getter for the component names in an unbaked geometry
+            * Fix render type hint not being copied in BlockGeometryBakingContext
+            * Ensure BlockRenderDispatches's renderSingleBlock uses the correct buffer
+ - 41.0.94  [1.19.x] Apply general renames, A SRG is provided for modders. (#8840)
+            See https://gist.github.com/SizableShrimp/882a671ff74256d150776da08c89ef72
+ - 41.0.93  Fix mob block breaking AI not working correctly when chunk 0,0 is unloaded. Closes #8853
+ - 41.0.92  Fix crash when breaking blocks with multipart models and remove caching. Closes #8850
+ - 41.0.91  Fixed `CompositeModel.Baked.Builder.build()` passing arguments in the wrong order (#8846)
+ - 41.0.90  Make cutout mipmaps explicitly opt-in for item/entity rendering (#8845)
+            * Make cutout mipmaps explicitly opt-in for item/entity rendering
+            * Default render type domain to "minecraft" in model datagens
+ - 41.0.89  Fixed multipart block models not using the new model driven render type system. (#8844)
+ - 41.0.88  Update to the latest JarJar to fix a collision issue where multiple jars could provide an exact match. (#8847)
+ - 41.0.87  Add FML config to disable DFU optimizations client-side. (#8842)
+            * Add client-side command line argument to disable DFU optimizations.
+            * Switch to using FMLConfig value instead.
+ - 41.0.86  [1.19] Fixed broken BufferBuilder.putBulkData(ByteBuffer) added by Forge (#8819)
+            * Fixes BufferBuilder.putBulkData(ByteBuffer)
+            * use nextElementByte
+            * Fixed merge conflict
+ - 41.0.85  [1.19.x] Fix shulker boxes allowing input of items, that return false for Item#canFitInsideContainerItems, through hoppers. (#8823)
+            * Make ShulkerBoxBlockEntity#canPlaceItemThroughFace delegate to Item#canFitInsideContainerItems.
+            * Switch to using Or and add comment.
+            * Switch Or to And.
+ - 41.0.84  [1.19.x] Added RenderLevelStageEvent to replace RenderLevelLastEvent (#8820)
+            * Ported RenderLevelStageEvent from 1.18.2
+            * Updated to fix merge conflicts
+ - 41.0.83  [1.19.x] Fix door datagenerator (#8821)
+            * Fix door datagenerator
+            Fix datagenerator for door blocks. Successor to #8687, addresses comments made there about statement complexity.
+            * Fix extra space around parameter
+            Fix extra space before comma around a parameter.
+ - 41.0.82  Create PieceBeardifierModifier to re-enable piecewise beardifier definitions (#8798)
+ - 41.0.81  Allow blocks to provide a dynamic MaterialColor for display on maps (#8812)
+ - 41.0.80  [1.19.x] BiomeTags Fixes/Improvements (#8711)
+            * dimension specific tag fix
+            * remove forge:is_beach cause vanilla has it already
+            * remove forge tags for new 1.19 vanilla tags (savanna, beach, overworld, end)
+            Co-authored-by: Flemmli97 <Flemmli97@users.noreply.github.com>
+ - 41.0.79  1.19 - Remove GlobalLootModifierSerializer and move to Codecs (#8721)
+            * convert GLM serializer class to codec
+            * cleanup
+            * GLM list needs to be sorted
+            * datagen
+            * simplify serialization
+            * fix test mods (oops)
+            * properly use suppliers for codec as they are registry obj
+ - 41.0.78  Implement item hooks for potions and enchantments (#8718)
+            * Implement item hooks for potions and enchantments
+            * code style fixes
+ - 41.0.77  Re-apply missing patch to ServerLevel.EntityCallbacks#onTrackingEnd() (#8828)
+ - 41.0.76  Double Bar Rendering fixed (#8806) (#8807)
+            * Double Bar Rendering fixed (#8806)
+            * Added requested changes by sciwhiz12
+ - 41.0.75  Multiple tweaks and fixes to the recent changes in the client refactor PR (#8836)
+            * Add an easy way to get the NamedGuiOverlay from a vanilla overlay
+            * Fix static member ordering crash in UnitTextureAtlasSprite
+            * Allow boss bar rendering to be cancelled
+            * Make fluid container datagen use the new name
+ - 41.0.74  Add FogMode to ViewportEvent.RenderFog (#8825)
+ - 41.0.73  Provide additional context to the getFieldOfView event (#8830)
+ - 41.0.72  Pass renderType to IForgeBakedModel.useAmbientOcclusion (#8834)
+ - 41.0.71  Load custom ITransformationServices from the classpath in dev (#8818)
+            * Add a classpath transformer discoverer to load custom transformation services from the classpath
+            * Update ClasspathTransformerDiscoverer to 1.18
+            * Update license year
+            * Update license header
+            * Fix the other license headers
+            * Update ClasspathTransformerDiscoverer to 1.19
+ - 41.0.70  Handle modded packets on the network thread (#8703)
+            * Handle modded packets on the network thread
+             - On the server we simply need to remove the call to
+               ensureRunningOnSameThread.
+             - On the client side, we now handle the packet at the very start of the
+               call. We make sure we're running from a network thread to prevent
+               calling the handling code twice.
+               While this does mean we no longer call .release(), in practice this
+               doesn't cause any leaks as ClientboundCustomPayloadPacket releases
+               for us.
+            * Clarify behaviour a little in the documentation
+            * Javadoc formatting
+            * Add a helper method for handling packets on the main thread
+            Also rename the network thread one. Should make it clearer the expected
+            behaviour of the two, and make it clearer there's a potentially breaking
+            change.
+            * Add back consumer() methods
+            Also document EventNetworkChannel, to clarify the thread behaviour
+            there.
+            * Add since = "1.19" to deprecated annotations
+ - 41.0.69  Cache resource listing calls in resource packs (#8829)
+            * Make the resource lookups cached.
+            * Include configurability and handle patch cleanup.
+            * Document and comment the cache manager.
+            * Make thread selection configurable.
+            * Implement a configurable loading mechanic that falls back to default behaviour when the config is not bound yet.
+            * Use boolean supplier and fix wildcard import.
+            * Clean up the VPR since this is more elegant.
+            * Clean up the VPR since this is more elegant.
+            * Address review comments.
+            * Address more review comments.
+            * Fix formatting on `getSource`
+            * Address comments by ichtt
+            * Adapt to pups requests.
+            * Stupid idea.
+            * Attempt this again with a copy on write list.
+            * Fix a concurrency and loading issue.
+            * Fix #8813
+            Checks if the paths are valid resource paths.
+            * Move the new methods on vanilla Patch.
+ - 41.0.68  Update SJH and JIJ
+ - 41.0.67  Fix #8833 (#8835)
+ - 41.0.66  Fix backwards fabulous check in SimpleBakedModel (#8832)
+            Yet another blunder we missed during the review of #8786.
+ - 41.0.65  Make texture atlas in StandaloneGeometryBakingContext configurable (#8831)
+ - 41.0.64  [1.19.X] Client code cleanup, updates, and other refactors (#8786)
+            * Revert "Allow safely registering RenderType predicates at any time (#8685)"
+            This reverts commit be7275443fd939db9c58bcad47079c3767789ac1.
+            * Renderable API refactors
+            - Rename "render values" to "context"
+            - Rename SimpleRenderable to CompositeRenderable to better reflect its use
+            - Remove IMultipartRenderValues since it doesn't have any real use
+            - Add extensive customization options to BakedModelRenderable
+            * ClientRegistry and MinecraftForgeClient refactors
+            - Add sprite loader manager and registration event
+            - Add spectator shader manager and registration event
+            - Add client tooltip factory manager and registration event
+            - Add recipe book manager and registration event
+            - Add key mapping registration event
+            - Remove ClientRegistry, as everything has been moved out of it
+            - Remove registration methods from MinecraftForgeClient, as they have dedicated events now
+            * Dimension special effects refactors
+            - Fold handlers into an extension class and remove public mutable fields
+            - Add dimension special effects manager and registration event
+            * HUD overlay refactors
+            - Rename to IGuiOverlay match vanilla (instead of Ingame)
+            - Add overlay manager and registration event
+            - Move vanilla overlays to a standalone enum
+            * Model loader refactors
+            - Rename IModelLoader to IGeometryLoader
+            - Add loader manager and registration event
+            - Fold all model events into one
+            - Move registration of additionally loaded models to an event
+            - Remove ForgeModelBakery and related classes as they served no purpose anymore
+            * Render properties refactors
+            - Rename all render properties to client extensions and relocate accordingly
+            - Move lookups to the respective interfaces
+            * Model data refactors
+            - Convert model data to a final class backed by an immutable map and document mutability requirements. This addresses several thread-safety issues in the current implementation which could result in race conditions
+            - Transfer ownership of the data manager to the client level. This addresses several issues that arise when multiple levels are used at once
+            * GUI and widget refactors
+            - Move all widgets to the correct package
+            - Rename GuiUtils and children to match vanilla naming
+            * New vertex pipeline API
+            - Move to vanilla's VertexConsumer
+            - Roll back recent PR making VertexConsumer format-aware. This is the opposite of what vanilla does, and should not be relevant with the updated lighting pipeline
+            * Lighting pipeline refactors
+            - Move to dedicated lighting package
+            - Separate flat and smooth lighters
+            - Convert from a vertex pipeline transformer to a pure vertex source (input is baked quads)
+            * Model geometry API refactors
+            - Rename IModelGeometry to IUnbakedGeometry
+            - Rename IModelConfiguration to IGeometryBakingContext
+            - Rename other elements to match vanilla naming
+            - Remove current changes to ModelState, as they do not belong there. Transforms should be specified through vanilla's system. ModelState is intended to transfer state from the blockstate JSON
+            - Remove multipart geometries and geometry parts. After some discussion, these should not be exposed. Instead, geometries should be baked with only the necessary parts enabled
+            * Make render types a first-class citizen in baked models
+            - Add named render types (block + entity + fabulous entity)
+            - Add named render type manager + registration event
+            - Make BakedModel aware of render types and transfer control over which ones are used to it instead of ItemBlockRenderTypes (fallback)
+            - (additional) Add concatenated list view. A wrapper for multiple lists that iterates through them in order without the cost of merging them. Useful for merging lists of baked quads
+            * General event refactors
+            - Several renames to either match vanilla or improve clarity
+            - Relocate client chat event dispatching out of common code
+            * Forge model type refactors
+            - Rename SeparatePerspectiveModel to SeparateTransformsModel
+            - Rename ItemModelMesherForge to ForgeItemModelShaper
+            - Rename DynamicBucketModel to DynamicFluidContainerModel
+            - Prefix all OBJ-related classes with "Obj" and decouple parsing from construction
+            - Extract ElementsModel from model loader registry
+            - Add EmptyModel (baked, unbaked and loader)
+            - Refactor CompositeModel to take over ItemMultiLayerBakedModel
+            - Remove FluidModel as it's not used and isn't compatible with the new fluid rendering in modern versions
+            - Move model loader registration to a proper event handler
+            - Update names of several JSON fields (backwards-compatible)
+            - Update datagens to match
+            * Miscellaneous changes and overlapping patches
+            - Dispatch all new registration events
+            - Convert ExtendedServerListData to a record
+            - Add/remove hooks from ForgeHooksClient as necessary
+            * Update test mods
+            * Fix VertexConsumerWrapper returning parent instead of itself
+            * Additional event cleanup pass
+            As discussed on Discord:
+            - Remove "@hidden" and "@see <callsite>" javadoc annotations from all client events and replace them with @ApiStatus.Internal annotation
+            - Make all events that shouldn't be fired directly into abstract classes with protected constructors
+            - Another styling pass, just in case (caught some missed classes)
+            * Add proper deprecation javadocs and de-dupe some vertex consumer code
+            * Replace sets of chunk render types with a faster BitSet-backed collection
+            This largely addresses potential performance concerns that using a plain HashSet might involve by making lookups and iteration as linear as they can likely be (aside from using a plain byte/int/long for bit storage). Further performance concerns related to the implementation may be addressed separately, as all the implementation details are hidden from the end user
+            * Requested changes
+            - Remove MinecraftForgeClient and move members to Minecraft, IForgeMinecraft and StencilManager
+            - Allow non-default elements to be passed into VertexConsumer and add support to derived classes
+            - Move array instantiation out of quad processing in lighting pipeline
+            - Fix flipped fluid container model
+            - Set default UV1 to the correct values in the remapping pipeline
+            - Minor documentation changes
+            * Add/update EXC entries and fix AT comment
+            * Add test mod as per Orion's request
+            * Additional requested changes
+            * Allow custom model types to request the particle texture to be loaded
+            * Even more requested changes
+            * Improve generics in ConcatenatedListView and add missing fallbacks
+            * Fix fluid render types being bound to the fluid and not its holder
+            * Remove non-contractual nullability in ChunkRenderTypeSet and add isEmpty
+            Additionally, introduce chunk render type checks in ItemBlockRenderTypes
+            Co-authored-by: Dennis C <xfacthd@gmx.de>
+ - 41.0.63  Implement full support for IPv6 (#8742)
+ - 41.0.62  Fix certain user-configured options being overwritten incorrectly due to validators. (#8780)
+ - 41.0.61  Allow safely registering RenderType predicates at any time (#8685)
+ - 41.0.60  Fix crash after loading error due to fluid texture gathering and config lookup (#8802)
+ - 41.0.59  Remove the configuration option for handling empty tags in ingredients. (#8799)
+            Now empty tags are considered broken in all states.
+ - 41.0.58  Fix MC-105317 Structure blocks do not rotate entities correctly when loading (#8792)
+ - 41.0.57  Fire ChunkWatchEvents after sending packets (#8747)
+ - 41.0.56  Add item handler capability to chest boats (#8787)
+ - 41.0.55  Add getter for correct BiomeSpecialEffectsBuilder to BiomeInfo$Builder (#8781)
+ - 41.0.54  Fix BlockToolModificationEvent missing cancelable annotation (#8778)
+ - 41.0.53  Fix ticking chunk tickets from forge's chunk manager not causing chunks to fully tick (#8775)
+ - 41.0.52  Fix default audio device config loading string comparison issue (#8767)
+ - 41.0.51  Fix missed vanilla method overrides in ForgeRegistry (#8766)
+ - 41.0.50  Add MinecraftServer reference to ServerTickEvent (#8765)
+ - 41.0.49  Fix TagsProviders for datapack registries not recognizing existing files (#8761)
+ - 41.0.48  Add callback after a BlockState was changed and the neighbors were updated (#8686)
+ - 41.0.47  Add biome tag entries for 1.19 biomes (#8684)
+ - 41.0.46  Make fishing rods use tool actions for relevant logic (#8681)
+ - 41.0.45  Update BootstrapLauncher to 1.1.1 and remove the forced
+            merge of text2speech since new BSL does it.
+ - 41.0.44  Merge text2speech libs together so the natives are part of the jar
+ - 41.0.43  Make Forge ConfigValues implement Supplier. (#8776)
+ - 41.0.42  Fix merge derp in AbstractModProvider and logic derp in ModDiscoverer
+ - 41.0.41  Add "send to mods in order" method to ModList and use it (#8759)
+            * Add "send to mods in order" method to ModList and use it in RegistryEvents and DataGen..
+            * Also preserve order in runAll
+            * Do better comparator thanks @pupnewfster
+            * postEvent as well.
+ - 41.0.40  Update SJH to 2.0.2.. (#8774)
+            * Update SJH to 2.0.3..
+ - 41.0.39  Sanity check the version specified in the mod file (#8749)
+            * Sanity check the version specified in the mod file to
+            make sure it's compatible with JPMS standards for
+            version strings.
+            Closes #8748
+            Requires SPI 6
+ - 41.0.38  Fix SP-Devtime world loading crash due to missing server configs (#8757)
+ - 41.0.37  Remove ForgeWorldPreset and related code (#8756)
+            Vanilla has a working replacement.
+ - 41.0.36  Change ConfigValue#get() to throw if called before config loaded  (#8236)
+            This prevents silent issues where a mod gets the value of the setting
+            before configs are loaded, which means the default value is always
+            returned.
+            As there may be situations where the getting the config setting before
+            configs are loaded is needed, and it is not preferable to hardcode the
+            default value, the original behavior is made available through #getRaw.
+            Implements and closes #7716
+            * Remove getRaw() method
+            This is effectively replaced with the expression `spec.isLoaded() ?
+            configValue.get() : configValue.getDefault()`.
+            * Remove forceSystemNanoTime config setting
+            As implemented, it never had any effect as any place where the config
+            value would be queried happens before the configs are loaded.
+ - 41.0.35  Fix EnumArgument to use enum names for suggestions (#8728)
+            Previously, the suggestions used the string representation of the enum
+            through Enum#toString, which can differ from the name of the enum as
+            required by Enum#valueOf, causing invalid suggestions (both in gui and
+            through the error message).
+ - 41.0.34  Jar-In-Jar (#8715)
+ - 41.0.33  [1.19] Fix data-gen output path of custom data-pack registries (#8724)
+ - 41.0.32  Fix player dive and surface animations in custom fluids (#8738)
+ - 41.0.31  [1.19.x] Affect ItemEntity Motion in Custom Fluids (#8737)
+ - 41.0.30  [1.19] Add support for items to add enchantments without setting them in NBT (#8719)
+ - 41.0.29  [1.19.x] Add stock biome modifier types for adding features and spawns (#8697)
+ - 41.0.28  [1.19.x] Fluid API Overhaul (#8695)
+ - 41.0.27  Replace StructureSpawnListGatherEvent with StructureModifiers (#8717)
+ - 41.0.26  Use stack sensitive translation key by default for FluidAttributes. (#8707)
+ - 41.0.25  Delete LootItemRandomChanceCondition which added looting bonus enchantment incorrectly. (#8733)
+ - 41.0.24  Update EventBus to 6.0, ModLauncher to 10.0.1 and BootstrapLauncher to 1.1 (#8725)
+ - 41.0.23  Replace support bot with support action (#8700)
+ - 41.0.22  Fix Reach Distance / Attack Range being clamped at 6.0 (#8699)
+ - 41.0.21  [1.19.x] Fix mods' worldgen data not being loaded when creating new singleplayer worlds (#8693)
+ - 41.0.20  [1.19.x] Fix experimental confirmation screen (#8727)
+ - 41.0.19  Move is_mountain to forge's tag instead of vanilla's (#8726)
+ - 41.0.18  [1.19.x] Add CommandBuildContext to Register Command Events (#8716)
+ - 41.0.17  Only rewrite datagen cache when needed (#8709)
+ - 41.0.16  Implement a simple feature system for Forge (#8670)
+            * Implement a simple feature system for Forge. Allows mods to demand certain features are available in the loading system. An example for java_version is provided, but not expected to be used widely. This is more targeted to properties of the display, such as GL version and glsl profile.
+            Requires https://github.com/MinecraftForge/ForgeSPI/pull/13 to be merged first in ForgeSPI, and the SPI to be updated appropriately in build.gradle files.
+            * rebase onto 1.19 and add in SPI update
+ - 41.0.15  displayTest option in mods.toml (#8656)
+            * displayTest option in mods.toml
+            * "MATCH_VERSION" (or none) is existing match version string behaviour
+            * "IGNORE_SERVER_VERSION" accepts anything and sends special SERVERONLY string
+            * "IGNORE_ALL_VERSION" accepts anything and sends an empty string
+            * "NONE" allows the mod to supply their own displaytest using the IExtensionPoint mechanism.
+            * Update display test with feedback and added the mods.toml discussion in mdk.
+ - 41.0.14  Update forgeSPI to v5 (#8696)
+ - 41.0.13  Make IVertexConsumers such as the lighting pipeline, be aware of which format they are dealing with. (#8692)
+            Also fix Lighting pipeline ignoring the overlay coords from the block renderer.
+ - 41.0.12  Fixed misaligned patch to invalidateCaps in Entity (#8705)
+ - 41.0.11  Fix readAdditionalLevelSaveData (#8704)
+ - 41.0.10  Fixes setPos to syncPacketPositionCodec (#8702)
+ - 41.0.9   Fix wrong param passed to PlayLevelSoundEvent.AtEntity (#8688)
+ - 41.0.8   Override initialize in SlotItemHandler, so it uses the itemhandler instead of container (#8679)
+ - 41.0.7   Update MDK for 1.19 changes (#8675)
+ - 41.0.6   Add helper to RecipeType, and fix eclipse compiler error in test class.
+ - 41.0.5   Update modlauncher to latest (#8691)
+ - 41.0.4   Fix getting entity data serializer id crashing due to improper port to new registry system (#8678)
+ - 41.0.3   Fire registry events in the order vanilla registers to registries (#8677)
+            Custom registries are still fired in alphabetical order, after all vanilla registries.
+            Move forge's data_serializers registry to forge namespace.
+ - 41.0.2   Add method with pre/post wrap to allow setting/clearing mod context. (#8682)
+            Fixes ActiveContainer in ModContext not being present in registry events. Closes #8680
+ - 41.0.1   Fix the Curlie oopsie
+ - 41.0.0   Forge 1.19
+            * Bump pack.mcmeta formats
+            * 1.19 biome modifiers
+            * Mark ClientPlayerNetworkEvent.LoggedOutEvent's getters as nullable
+            * Add docs and package-info to client extension interfaces package
+            * Move RenderBlockOverlayEvent hooks to ForgeHooksClient
+            * Add package-infos to client events package
+            * Rename SoundLoadEvent to SoundEngineLoadEvent
+            This reduces confusion from consumers which may think the
+            name SoundLoadEvent refers to an individual sound being loaded rather
+            than the sound engine.
+            * Document and change SoundLoadEvent to fire on mod bus
+            Previously, it fired on both the mod bus and the Forge bus, which is
+            confusing for consumers.
+            * Delete SoundSetupEvent
+            Looking at its original implementation shows that there isn't an
+            appropriate place in the new sound code to reinsert the event, and the
+            place of 'sound engine/manager initialization event' is taken already by SoundLoadEvent.
+            * Perform some cleanup on client events
+             - Removed nullable annotations from ClientPlayerNetworkEvent
+             - Renamed #getPartialTicks methods to #getPartialTick, to be consistent
+              with vanilla's naming of the partial tick
+             - Cleanup documentation to remove line breaks, use the
+              spelling 'cancelled' over
+              'canceled', and improve docs on existing and
+               new methods.
+            * Remove EntityEvent.CanUpdate
+            Closes MinecraftForge/MinecraftForge#6394
+            * Switch to Jetbrains nullability annotations
+            * New PlayLevelSoundEvent; replaces old PlaySoundAtEntityEvent
+            * Remove ForgeWorldPresetScreens
+            * Remove IForgeRegistryEntry
+            * Remove use of List<Throwable> in FML's CompletableFutures
+            * Add docs to mod loading stages, stages, and phases
+            * Gradle 7.4.2
+            * Use SLF4J in FMLLoader and other subprojects
+            * Switch dynamic versions in subprojects to pinned ones
+            * Switch ForgeRoot and MDK to FG plugin markers
+            * Configure Forge javadoc task
+            The task now uses a custom stylesheet with MCForge elements, and
+            configured to combine the generation from the four FML subprojects
+            (fmlloader, fmlcore, javafmllanguage, mclanguage) and the Forge project
+            into the javadoc output.
+            * Update docs/md files, for 1.19 update and the move away from IRC to Discord.
+            * Make "Potentially dangerous alternative prefix" a debug warning, not info.
+            Co-authored-by: Curle <curle@gemwire.uk>
+            Co-authored-by: sciwhiz12 <arnoldnunag12@gmail.com>
+
+
+v9: todos os ícones redesenhados em 16x16 (map_icons.png) e 32x32 (map_icons32.png, usado nas cartas de Origem); gerador tools/art/make_map_icons.py agora é independente de tamanho (superamostragem 8x).
+v10: criação de personagem: abas viraram bandeiras de pixel art (ondulam, mastro, pedra de estado no alto), balão da bandeira só após 15 s com o mouse parado, aba Origem removida (7 abas; protocolo 6; rascunho versão 2).
+v11: ícones das bandeiras animados POR DENTRO (sem subir/descer nem andar de lado): cabelo ondula com reflexo de luz, chama da alma balança e pisca (com faíscas), ouro do emblema/roupa brilha, lenço ondula, peito respira (só no sombreado), areia desce na ampulheta, dado com estrelinha. 7 ícones x 8 quadros em textures/gui/map_icons_anim.png (gerado por tools/art/make_icon_anim.py; usado por MapIcons.drawLive). O pulinho ao abrir a aba foi removido.
+v11 (ajuste): texto do editor do lema (janela do Passado) menor: escala 2x -> 1x (ME_SCALE em CharacterMap).
+v11 (som e transições): sons novos ui/open (mapa se desenrola ao abrir), ui/flap (cada bandeira estala ao sair do mastro) e ui/hover (tique macio ao passar o mouse numa bandeira), gerados por tools/build_ui_sounds.py e registrados em ModSounds/sounds.json. Transições: fade vindo do escuro ao abrir a tela (0,5 s) e névoa de pergaminho que clareia a página ao trocar de aba (junto com o deslize). Em CharacterMap.fades().
+v11 (resumo e selo): resumo final: linhas (idade, mar, gênero, alma, lema, nome) com faixa de destaque animada (entra da esquerda, trilho de ouro e brilho passando) e balão bonito que aparece em 0,3 s (era 5 s) com detalhes: fase da idade, clima/curiosidade do mar, nota do gênero, força e contradição da alma, lema completo (novas chaves age.phase.N.desc em pt_br/en_us). Aviso 'salvo para sempre' quebrado em duas linhas equilibradas. Tela do selo agora dura 4,8 s (antes 1,5 s), com anel pulsando e brasas subindo, e termina num fade suave que revela o jogo (CharacterMap.exitAlpha + CharacterCreationScreen.render), sem escurecer para preto.
+
+Aba Alma (ajustes)
+- Painel do destino com texto menor (título a 85%, força e contradição a 75%).
+- Dado do botão de rolar desceu 2 px, alinhado com o texto.
+- Cada alma agora tem 4 textos de força e 4 de contradição (16 combinações por alma); o texto sai dos seis traços, sem nada novo para salvar. Vale também para a ficha no chat (/ficha).
+- Jackpot: 3% de chance por rolagem de os seis traços saírem no máximo (cada eixo num extremo). Revela a alma "Lenda dos Mares" com plaquinhas e painel brilhando.
+- Plaquinha ainda não sorteada: o ícone apagado não vira mais um quadrado escuro no hover (usa a cor do fundo do hover).
+- Correção: o texto menor é o do valor dentro de cada plaquinha de traço (80%); o painel do destino voltou ao tamanho original.
+- Alma lendária: plaquinhas com fundo dourado pulsando.
+- Botões de sugestão do Epíteto: uma linha só, todos no mesmo tamanho (o da maior frase, encolhido até caber).
+
+Idade (aba Passado)
+- Os botões -10/-1/+1/+10 viraram um controle deslizante: arraste a plaquinha, clique na barra ou use a roda do mouse (±1 ano). Marcas a cada 10 anos e tique de som ao mudar.
+
+Botão Finalizar
+- Transição animada entre cinza ("Nome necessário") e vermelho ("Finalizar"): cor, medalhão e texto mudam aos poucos (0,45 s). Ao ficar vermelho: clarão, anel de luz, selo que carimba e um som. Ao voltar a cinza: tremidinho e um toque surdo.
+
+v11 (desempenho da criação de personagem)
+- Todos os retângulos do quadro entram num lote só (GuiGraphics.drawManaged em CharacterMap.render e no fundo escuro da tela): antes cada fill() do jogo era uma chamada de desenho própria (~3.800 por quadro), agora são ~60. Imagens (MapIcons, MapArt.sheet), texto (MapFont), o boneco 3D, os campos de texto, o recorte do retrato e a cor do shader da marca-d'água chamam g.flush() antes, então a ordem das camadas é exatamente a de antes. REGRA PARA CÓDIGO NOVO: qualquer blit(), drawString(), troca de recorte/cor de shader ou desenho 3D dentro de CharacterMap precisa de g.flush() ANTES (e o flush vem antes do RenderSystem.enableBlend(), porque terminar o lote desliga o blend).
+- Bandeiras (MapArt.flag): colunas vizinhas iguais saem num retângulo só e o recorte do pano é calculado uma vez por formato e tamanho (antes: 5 chamadas de cloth() por pixel, por quadro).
+- Fundo do retrato (MapArt.idBackdrop): posições das fibras do papel guardadas (antes: ~20.000 hash por quadro) e o pontilhado vermelho sai em trechos.
+- Validação do nome (CharacterOptions.firstBadChar): sem compilar uma regex por letra (era chamada várias vezes por quadro por causa de tabState); mesma regra, conferida em todos os caracteres Unicode.
+- tools/preview_java/stubs: GuiGraphics ganhou flush() e drawManaged() (vazios) para o preview continuar compilando.
+- O desenho não mudou: conferido quadro a quadro (360 quadros em todas as abas, resumo, selo e editor do lema) contra a versão anterior.
+
+v12 (rosto e adereços)
+- Faces refeitas para combinar com TODOS os estilos de olhos: sobrancelhas "Determinado", cicatriz do olho, marcas de expressão e olhar cansado agora medem a linha de cima do olho escolhido (SkinPainter.eyeTop) e se posicionam em volta dele; antes eram posições fixas pensadas só para o olho padrão. As marcas só pintam pele nua (não passam por cima de franja/cabelo) e nunca apagam o desenho do olho (a cicatriz só avermelha o branco).
+- Novos adereços do rosto (aba Corpo > Rosto, embaixo das faces): 12 opções, seleção múltipla com limite de 3 (clicar de novo tira; com 3 marcados as outras ficam apagadas, avisam no contador e tocam o som de negado). Salvos em CharacterData.adorn (máscara de bits, índice 21 dos números; INT_COUNT 22), com validação no servidor (bits conhecidos, no máximo 3). Registros e rascunhos antigos continuam válidos (sem adereços). Protocolo de rede 8 -> 9.
+- Aleatório sorteia de 0 a 2 adereços; "Limpar aba" do Corpo também limpa os adereços.
+- Testes novos em tools/tests: validação/rascunho/registro antigo dos adereços e varredura faces x 52 olhos x 2 gêneros x piscar x olhar x adereços (24 mil skins).
+
+v13 (rosto: faces e adereços juntos)
+- Faces e adereços viraram UMA lista só na página Rosto (19 itens: 7 faces com marca + 12 adereços; "Padrão" = nenhum marcado). O jogador marca até 3 itens de qualquer tipo, misturando faces e adereços como quiser. Guardado na mesma máscara de bits (CharacterData.adorn: bits 0-11 adereços, 12-18 faces); registros antigos com um estilo de rosto viram o bit correspondente.
+- Adereços agora são pintados NA TEXTURA da cabeça (camada de baixo), não mais na camada externa: nada fica saltado para fora, como se fosse um modelo maior.
+- Sobrancelha "Determinado" colada no desenho de cada estilo de olho: usa as mesmas colunas e a mesma cor do contorno do olho (viram um traço só), com a ponta de fora subindo; nos olhos sem contorno usa a cor do cabelo. As duas sobrancelhas deixam um vão no meio (não viram uma só).
+- Cicatrizes refeitas com sulco vermelho-escuro e borda clara levantada (aparecem em todos os tons de pele) e sem afetar os olhos: o desenho do olho fica intacto.
+- Casas apagadas (limite de 3 atingido) ficam menos escuras para dar para ver as opções.
+
+v14 (rosto: classes, metal dos piercings, cicatrizes cicatrizadas)
+- Página Rosto dividida em 3 classes (abas pequenas): Faces, Piercings e Outros e Cicatrizes. O limite de 3 itens vale para o conjunto todo (CharacterOptions.ITEM_CLASS_ORDER diz o que está em cada classe).
+- Piercings (sobrancelha, nariz, septo, lábio): botões Prata / Dourado escolhem o metal de todos eles (CharacterData.metal, índice 22 dos números; INT_COUNT 23; protocolo de rede 9 -> 10). Registros antigos: prata.
+- Embaixo da grade aparecem os nomes de tudo que está marcado (um por linha), de qualquer classe; sem nada marcado: "rosto padrão". O título mostra o nome da classe aberta e o contador n/3.
+- Cicatrizes (olho e bochecha) agora já cicatrizadas: tecido claro e liso com sombra suave, sem vermelho; continuam sem tocar nos olhos.
+
+v15 (mais piercings)
+- 7 piercings novos na classe Piercings (agora 11): sobrancelha esquerda, narina esquerda, ponte do nariz, Monroe, labret, cantos da boca e sobrancelha dupla. Todos seguem o metal escolhido (prata ou dourado) e a posição das sobrancelhas acompanha o estilo de olhos.
+- Itens do rosto: 26 bits (CharacterOptions.FACE_ITEMS); os novos piercings usam os bits 19 a 25 (PIERCE_BIT_BASE), então personagens salvos continuam iguais.
+- Casas da grade do rosto um pouco mais baixas (22 px) para caber duas fileiras de piercings, o seletor de metal e os 3 nomes marcados.

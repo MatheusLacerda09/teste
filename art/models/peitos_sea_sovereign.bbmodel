@@ -1,0 +1,679 @@
+{
+  "meta": {
+    "format_version": "5.0",
+    "model_format": "free",
+    "box_uv": false
+  },
+  "name": "peitos_sea_sovereign",
+  "model_identifier": "",
+  "visible_box": [
+    1,
+    1,
+    0
+  ],
+  "variable_placeholders": "",
+  "multi_file_ruleset": "",
+  "variable_placeholder_buttons": [],
+  "timeline_setups": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "corpo (referencia)",
+      "box_uv": true,
+      "render_order": "default",
+      "locked": true,
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 1,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            20,
+            28,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            16,
+            20,
+            20,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            32,
+            20,
+            40,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            28,
+            20,
+            32,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            20,
+            20,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            36,
+            16,
+            28,
+            20
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "0f3641b0-b1f6-4b54-b3be-8e06a0c47b1f"
+    },
+    {
+      "name": "corpo camada externa (referencia)",
+      "box_uv": true,
+      "render_order": "default",
+      "locked": true,
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 1,
+      "color": 0,
+      "inflate": 0.25,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        32
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            36,
+            28,
+            48
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            16,
+            36,
+            20,
+            48
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            32,
+            36,
+            40,
+            48
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            28,
+            36,
+            32,
+            48
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            36,
+            20,
+            32
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            36,
+            32,
+            28,
+            36
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "a706cfc5-c112-4827-ac3a-acc98ec69d1a"
+    },
+    {
+      "name": "peito direito",
+      "box_uv": false,
+      "render_order": "default",
+      "locked": false,
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "from": [
+        -4,
+        19.8,
+        -2
+      ],
+      "to": [
+        0,
+        23.8,
+        1
+      ],
+      "autouv": 0,
+      "color": 1,
+      "rotation": [
+        37,
+        0,
+        0
+      ],
+      "origin": [
+        0,
+        23.8,
+        -2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            24,
+            20,
+            28,
+            24
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            24,
+            20,
+            25,
+            24
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            24,
+            20,
+            28,
+            24
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            27,
+            20,
+            28,
+            24
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            21,
+            24,
+            20
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            28,
+            24,
+            24,
+            25
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "2486bb13-3d16-4af7-9123-55bd5c587a9c"
+    },
+    {
+      "name": "peito esquerdo",
+      "box_uv": false,
+      "render_order": "default",
+      "locked": false,
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "from": [
+        0,
+        19.8,
+        -2
+      ],
+      "to": [
+        4,
+        23.8,
+        1
+      ],
+      "autouv": 0,
+      "color": 1,
+      "rotation": [
+        37,
+        0,
+        0
+      ],
+      "origin": [
+        0,
+        23.8,
+        -2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            20,
+            24,
+            24
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            20,
+            20,
+            21,
+            24
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            20,
+            20,
+            24,
+            24
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            23,
+            20,
+            24,
+            24
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            24,
+            21,
+            20,
+            20
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            24,
+            24,
+            20,
+            25
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "a103d611-e0c7-4e3b-b17c-91a70433cb03"
+    },
+    {
+      "name": "peito direito (camada externa)",
+      "box_uv": false,
+      "render_order": "default",
+      "locked": false,
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "from": [
+        -4,
+        19.8,
+        -2
+      ],
+      "to": [
+        0,
+        23.8,
+        1
+      ],
+      "autouv": 0,
+      "color": 3,
+      "inflate": 0.26,
+      "rotation": [
+        37,
+        0,
+        0
+      ],
+      "origin": [
+        0,
+        23.8,
+        -2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            24,
+            36,
+            28,
+            40
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            24,
+            36,
+            25,
+            40
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            24,
+            36,
+            28,
+            40
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            27,
+            36,
+            28,
+            40
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            37,
+            24,
+            36
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            28,
+            40,
+            24,
+            41
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "3521e34e-df39-4526-888c-592bdfe62d09"
+    },
+    {
+      "name": "peito esquerdo (camada externa)",
+      "box_uv": false,
+      "render_order": "default",
+      "locked": false,
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "from": [
+        0,
+        19.8,
+        -2
+      ],
+      "to": [
+        4,
+        23.8,
+        1
+      ],
+      "autouv": 0,
+      "color": 3,
+      "inflate": 0.26,
+      "rotation": [
+        37,
+        0,
+        0
+      ],
+      "origin": [
+        0,
+        23.8,
+        -2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            36,
+            24,
+            40
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            20,
+            36,
+            21,
+            40
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            20,
+            36,
+            24,
+            40
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            23,
+            36,
+            24,
+            40
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            24,
+            37,
+            20,
+            36
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            24,
+            40,
+            20,
+            41
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "752e102e-0ea4-4df2-8421-eaf36b6a7379"
+    }
+  ],
+  "groups": [
+    {
+      "name": "corpo",
+      "uuid": "b17289fb-6ab6-4833-96e5-782618c9fc2f",
+      "export": true,
+      "locked": false,
+      "scope": 0,
+      "selected": false,
+      "visibility": true,
+      "_static": {
+        "properties": {},
+        "temp_data": {}
+      },
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "color": 0,
+      "children": [],
+      "reset": false,
+      "shade": true,
+      "mirror_uv": false,
+      "autouv": 0,
+      "isOpen": true,
+      "primary_selected": false
+    },
+    {
+      "name": "peitos",
+      "uuid": "0fef72a5-dff9-4807-8aec-ea4f1ffdaf1a",
+      "export": true,
+      "locked": false,
+      "scope": 0,
+      "selected": false,
+      "visibility": true,
+      "_static": {
+        "properties": {},
+        "temp_data": {}
+      },
+      "origin": [
+        0,
+        22.8,
+        -2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "color": 1,
+      "children": [],
+      "reset": false,
+      "shade": true,
+      "mirror_uv": false,
+      "autouv": 0,
+      "isOpen": true,
+      "primary_selected": false
+    }
+  ],
+  "outliner": [
+    {
+      "uuid": "b17289fb-6ab6-4833-96e5-782618c9fc2f",
+      "isOpen": true,
+      "children": [
+        "0f3641b0-b1f6-4b54-b3be-8e06a0c47b1f",
+        "a706cfc5-c112-4827-ac3a-acc98ec69d1a"
+      ]
+    },
+    {
+      "uuid": "0fef72a5-dff9-4807-8aec-ea4f1ffdaf1a",
+      "isOpen": true,
+      "children": [
+        "2486bb13-3d16-4af7-9123-55bd5c587a9c",
+        "a103d611-e0c7-4e3b-b17c-91a70433cb03",
+        "3521e34e-df39-4526-888c-592bdfe62d09",
+        "752e102e-0ea4-4df2-8421-eaf36b6a7379"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "base_female.png",
+      "path": "",
+      "folder": "",
+      "namespace": "",
+      "id": "0",
+      "group": "",
+      "scope": 0,
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "particle": false,
+      "use_as_default": true,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "file_format": "png",
+      "render_mode": "default",
+      "render_sides": "auto",
+      "wrap_mode": "limited",
+      "pbr_channel": "color",
+      "fps": 7,
+      "force_translucent": false,
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "91902551-7e41-4592-89f8-aba022d71687",
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFEklEQVR4nO2bz2sbRxTHvyqiF9nSSDrUYLANBoGbIHrIJbT+BwzJsScf2mOxb3V8UU9NfYpDCTjkZJKDT6KH0FB6Sw9xKJRSgmhcMBjWxgJdpJVl7a2gHqq3fZp9O6vdlbSG7uek3ZnZefPmzZtfTxkE8K7+bGBKvzg9M5a//81+JqiOJPkgaQGSJlVA0gIkTaqApAVImlQBSQuQNJmgeX7afPL5V4muE/73FpAqQH/Rdxz0HSf0h6KWS5osf+g7DjrN1r8Piwvu+7lcTizMG8zL+eW/iWSll7227f4uLS4Ye5Ya3mvbyJeLExZv+mT1xpWGPV9aXECn2UKn2cJSZVUsTDtBXgYYtYybbg1Z13SHlBYX3IaEgcro3+tEl20meOZgy7JG1gWNowPXGnptG5vfHxrnbcuyBo2jAzGturmNk5MTXF9fi+nz8/PY2Ngwfv9d/dmA+yoarkFy+SH6gOXlZQDA+fm5x7zHhfsRABP3D3xYBh3KmPAooFAoAAC63W7kj84CarSu6LCIFsCZy+XQdxzM5XI3ajyX2HQbxwIytm179gJKKXS7XVxdXYmFyEoAiHkaRwduz+TLRXeKrG5ui98z+Yzubz973o+sV4aUtPXHuHuMrFJKTFBK+SqAl5Hy0PgkQVeqa8bpcH2rhjdP9zzv/OqfJJkfv9sZ8N4CgHu1R4EWoJTCq70HuFd7ZKxgnDzkb+r1OizLwu7uLgC4dejrED+T5/nGtgBp3n+19wAAfE2WemucmWF9qxaYRymFty8e49aHwK1KGe9fHuLTL74W816cnvk6vovTMyxVVkPtSUQnSA07fvJQLLRSXXN/S7OFPkToWcr75umeZ/wCwNsXjz3jnGTzUwDJbTX+EtMljLOANHfrlb9/eTjy3Gm2UN3cHnGUNJxoUaULLfmHuVwOGC7AwvRo33FGOiiILAldknZ/PiZOGl6prrkrRM7lLz/gkn3nctiAXtseyUsKnmNOk9cv7UP6jmNcVIXde7gWQPM9VaIrhUNenfJzgaQepWdSWFjhyemRMqLsVfzwHQJBlVDjaZ8QBV1ZugVQg/12oya5xsVVQFBBUyO58+m1bddC/vz1dwDA7bt30HeckaHD66UG6xbgJ5OfLFEsIysVlCqg1RyN43y5GFjh7bt3xhKCGkr16t/ly3FSqgQpP4xFZo6f77tLYeoBqkxacPTattuwvuOg99HHnjym7a6EKf/ff7zGUmXVneOB0Y0QX2oTS5XVxI/bU1JSUlJSUlJSUlJSUlJSbi4TPzTQ4wuOnzx0T486zVbg/weOn+8PpEvPaf3vIPB2OAo8voAfnYU9swtzGBqVqSig2+1CKYVCoYBe2458jB3n2ntcpqIAHX6oGYZZWEDscaWPeWA0fkCCxx/osQF+V2XAf4e1fcfBZ1/uTMQnxLYAGu9hUUpBKYVGXAFiElsBfrFEdLcPAH7xBxKdZsu9KyToSJzSot5ESUzFB+jxA37xB+tbNfGqm98BcHpt2xgfEIXYCvjp2x3Pu6DraVKIVJan+6VNUgGJhsubFEXR5/zGmphkzGFsC5CE4VdsBL9up0vSfLno2xg+E5BPoLwzuR6Pgx5foMcY0m2xKQYBmG5cADG1hZBJWB5bYMrDHeG0/owxk5XgOP834Ehh95Q3TkCGRGwFmDwy72H+W4or0r9JmygeiqPHGE2CqVgAxepJzpDSAbjBDvodP48D4AuffLnoxgpMin8A9D+dHkn5oiwAAAAASUVORK5CYII="
+    }
+  ]
+}
